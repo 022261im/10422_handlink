@@ -165,7 +165,7 @@ function makeDrafts(source,count,types){
  const drafts=[],limit=Math.max(1,Math.min(Number(count)||6,20)),used=new Set();
  const selected=types.filter(Boolean);
  if(!selected.length)return [];
- function add(q){const key=q.type+'|'+q.prompt;if(used.has(key))return false;used.add(key);q.id=uid();q.sourceId=source.id;q.status='confirmed';q.excluded=false;q.createdAt=new Date().toISOString();q.confidenceLog=[];drafts.push(q);return true}
+ function add(q){const key=q.type+'|'+q.prompt+'|'+(q.conceptA||'')+'|'+(q.conceptB||'');if(used.has(key))return false;used.add(key);q.id=uid();q.sourceId=source.id;q.status='confirmed';q.excluded=false;q.createdAt=new Date().toISOString();q.confidenceLog=[];drafts.push(q);return true}
  const termsUnique=[...new Set(terms.map(x=>x.term))];
  let cursor=0,attempts=0;
  while(drafts.length<limit&&attempts<limit*8){
@@ -181,7 +181,7 @@ function makeDrafts(source,count,types){
     add({type:'short',title:'핵심 용어 회상',prompt:'다음 설명에서 핵심 용어를 찾아 입력해 줘.\n\n'+line,answer:term,accepted:[term],explanation:'자동 추출한 핵심 용어야. 원문 문맥에서 실제 정답이 맞는지 확인해 줘.',sourceText:line,sourcePage:pageFrom(line,text)});
    }else if(mode===1){
     const others=termsUnique.filter(t=>t!==term);
-    const options=[term,...others.slice(cursor%Math.max(1,others.length),cursor%Math.max(1,others.length)+3)].filter((v,i,a)=>a.indexOf(v)===i);
+    const options=[term,...others.filter(t=>t!==term).sort(()=>Math.random()-.5).slice(0,3)].filter((v,i,a)=>a.indexOf(v)===i);
     if(options.length>=3){
      const shuffled=options.sort(()=>Math.random()-.5);
      add({type:'mcq',title:'핵심 개념 선택',prompt:'다음 원문 설명과 가장 직접적으로 연결되는 용어는?\n\n'+line,options:shuffled,answer:term,accepted:[term],explanation:'정답과 오답 선택지는 자료에서 추출한 용어야. 자동 생성만으로 오답의 타당성을 보장할 수 없으니 확인해 줘.',sourceText:line,sourcePage:pageFrom(line,text)});
@@ -189,7 +189,13 @@ function makeDrafts(source,count,types){
      add({type:'short',title:'핵심 용어 회상',prompt:'다음 설명에서 핵심 용어를 찾아 입력해 줘.\n\n'+line,answer:term,accepted:[term],explanation:'자료에서 추출한 핵심 용어를 확인해 줘.',sourceText:line,sourcePage:pageFrom(line,text)});
     }
    }else{
-    add({type:'ox',title:'원문 확인',prompt:'다음 문장이 제공된 자료에 그대로 제시되어 있는가?\n\n'+line,answer:'O',accepted:['O','맞다','참','true'],explanation:'자료에 해당 문장이 그대로 포함되어 있는지 원문과 대조해 판단해.',sourceText:line,sourcePage:pageFrom(line,text)});
+    const wrong=termsUnique.find(t=>t!==term);
+    if(wrong){
+     const isTrue=Math.random()<0.5,claimed=isTrue?term:wrong;
+     add({type:'ox',title:'핵심 개념 판별',prompt:'다음 설명의 핵심 용어가 "'+claimed+'"라는 진술은 옳을까?\\n\\n'+line,answer:isTrue?'O':'X',accepted:isTrue?['O','맞다','참','true']:['X','아니다','거짓','false'],explanation:'자동 추출한 용어와 원문을 대조해 판단해. 핵심 용어 추출이 완벽하지 않을 수 있으니 정답을 확인해 줘.',sourceText:line,sourcePage:pageFrom(line,text)});
+    }else{
+     add({type:'short',title:'핵심 용어 회상',prompt:'다음 설명에서 핵심 용어를 찾아 입력해 줘.\\n\\n'+line,answer:term,accepted:[term],explanation:'자료에서 추출한 핵심 용어를 확인해 줘.',sourceText:line,sourcePage:pageFrom(line,text)});
+    }
    }
   }else if(kind==='compare'){
    const other=terms.find((x,j)=>x.term!==term&&x.line!==line&&x.term&&x.term!=='핵심 개념');
