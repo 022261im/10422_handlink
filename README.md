@@ -33,3 +33,37 @@ index.html을 브라우저에서 열거나 GitHub Pages를 활성화해 정적 �
 4. 실제 시험 일정 기반 간격 복습 및 자동화 테스트
 
 TRACE · Study with Purpose
+
+
+## 실제 OpenAI API 연결 (FastAPI + Render)
+
+프런트엔드는 GitHub Pages에 두고, OpenAI API 호출은 `backend/`의 FastAPI 서버에서 처리합니다. 브라우저 코드에는 API 키를 넣지 않습니다.
+
+### Render 배포
+1. Render에서 **New → Blueprint**를 선택하고 GitHub 저장소 `022261im/quiz`를 연결합니다. 저장소 루트의 `render.yaml`을 사용합니다.
+2. Render가 `trace-ai-api` 웹 서비스를 생성하도록 진행합니다.
+3. 서비스의 **Environment** 메뉴에서 `OPENAI_API_KEY`에 본인의 OpenAI API 키를 직접 입력하고 저장합니다. 이 값은 GitHub에 커밋하지 마세요.
+4. 배포가 끝나면 Render가 제공한 `https://...onrender.com` 주소를 복사합니다.
+5. TRACE → AI 자료 제작실 → **AI 서버 주소**에 주소를 입력하고 저장한 뒤 **연결 테스트**를 누릅니다.
+6. 연결이 확인되면 문항 생성을 실행합니다.
+
+### 보안과 한계
+- API 키는 Render 환경 변수에만 저장되며 프런트엔드로 전달되지 않습니다.
+- 브라우저에서 추출한 텍스트가 AI 서버로 전송됩니다. 민감한 개인정보가 포함된 파일은 업로드하지 마세요.
+- 기본 설정은 IP별 분당 8회 요청 제한, 원문 최대 40,000자, 요청당 최대 20문항입니다. 이는 기본적인 남용 방지이며 완전한 인증은 아닙니다.
+- OpenAI API 사용료가 발생할 수 있습니다. 계정의 결제와 사용량 제한을 확인하세요.
+- 현재 개인 코드는 브라우저 내 학습 공간을 구분할 뿐, 서버 계정 인증이나 기기 간 동기화를 제공하지 않습니다.
+- AI가 생성한 답도 틀릴 수 있습니다. 문항에 표시되는 원문 근거를 확인하세요.
+- Render 무료 서비스는 일정 시간 사용하지 않으면 잠들 수 있어 첫 요청이 느릴 수 있습니다.
+
+### 로컬 서버 테스트
+```bash
+cd backend
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+# OPENAI_API_KEY 환경 변수를 설정한 뒤:
+uvicorn main:app --reload --port 8000
+```
+그 다음 AI 서버 주소에 `http://127.0.0.1:8000`을 입력합니다.
