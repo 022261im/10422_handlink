@@ -1,6 +1,6 @@
 (()=> {
 const $=id=>document.getElementById(id), video=$('inputVideo'),canvas=$('outputCanvas'),ctx=canvas.getContext('2d');
-let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,confirmed=false,logs=[],cameraBusy=false;
+let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',recentClassifications=[],currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,confirmed=false,logs=[],cameraBusy=false;
 const gestures={
  point:{label:'검지 가리키기',icon:'☝️',phrase:'이것을 원해요'},
  open:{label:'손바닥 펴기',icon:'✋',phrase:'잠시만 기다려 주세요'},
@@ -15,24 +15,35 @@ const kioskGesture={point:0,peace:1,three:2,four:3};
 const menu=[...document.querySelectorAll('.food-item')];
 function toast(s){const t=$('toast');t.textContent=s;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.hidden=true,2500)}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
-function extended(p,tip,pip){return p[tip].y < p[pip].y-.018}
+function angleAt(a,b,c){
+ const ux=a.x-b.x,uy=a.y-b.y,vx=c.x-b.x,vy=c.y-b.y;
+ const den=Math.hypot(ux,uy)*Math.hypot(vx,vy);
+ if(!den)return 0;
+ return Math.acos(Math.max(-1,Math.min(1,(ux*vx+uy*vy)/den)))*180/Math.PI;
+}
+function fingerExtended(p,mcp,pip,tip,palm){
+ const straight=angleAt(p[mcp],p[pip],p[tip])>145;
+ const reach=dist(p[0],p[tip])-dist(p[0],p[pip])>palm*.10;
+ return straight&&reach;
+}
 function classify(p){
- const index=extended(p,8,6),middle=extended(p,12,10),ring=extended(p,16,14),pink=extended(p,20,18);
- const thumbSide=dist(p[4],p[5])>dist(p[3],p[5])*1.18;
- const thumbUp=p[4].y < p[3].y-.035 && (Math.abs(p[4].x-p[3].x)<.16 || p[4].y<p[5].y-.09);
- const others=[index,middle,ring,pink].filter(Boolean).length;
- const palmWidth=Math.max(dist(p[5],p[17]),.001);
- const pinch=dist(p[4],p[8])/palmWidth < .34;
- if(thumbUp && !index && !middle && !ring && !pink) return 'thumb';
- if(pinch && index && !middle && !ring && !pink) return 'pinch';
- if(index&&middle&& !ring&&!pink) return 'peace';
- if(index&&middle&&ring&&!pink) return 'three';
- if(index&&middle&&ring&&pink&&!thumbSide) return 'four';
- if(index&&!middle&&!ring&&!pink) return 'point';
- if(index&&middle&&ring&&pink) return 'open';
- if(!index&&!middle&&!ring&&!pink&&!thumbSide) return 'fist';
- if(others===4)return 'open';
- if(others===0)return 'fist';
+ const palm=Math.max(dist(p[5],p[17]),dist(p[0],p[9])*.55,.001);
+ const index=fingerExtended(p,5,6,8,palm);
+ const middle=fingerExtended(p,9,10,12,palm);
+ const ring=fingerExtended(p,13,14,16,palm);
+ const pink=fingerExtended(p,17,18,20,palm);
+ const thumbIndex=dist(p[4],p[8])/palm;
+ const thumbRaised=p[4].y<p[0].y-palm*.22 && p[4].y<p[3].y-palm*.08;
+ const otherCurled=!index&&!middle&&!ring&&!pink;
+ // "괜찮아요": thumb and index touch, with the other three fingers extended.
+ if(thumbIndex<.30&&middle&&ring&&pink)return 'pinch';
+ // "엄지 올리기": thumb is clearly above the wrist while the four fingers are curled.
+ if(thumbRaised&&otherCurled&&dist(p[4],p[2])>palm*.45)return 'thumb';
+ if(index&&middle&&ring&&!pink)return 'three';
+ if(index&&middle&&!ring&&!pink)return 'peace';
+ if(index&&!middle&&!ring&&!pink)return 'point';
+ if(index&&middle&&ring&&pink)return 'open';
+ if(!index&&!middle&&!ring&&!pink)return 'fist';
  return null;
 }
 function drawResults(res){
@@ -41,7 +52,7 @@ function drawResults(res){
  if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
  ctx.clearRect(0,0,w,h);ctx.drawImage(res.image,0,0,w,h);
  const p=res.multiHandLandmarks?.[0];
- if(!p){candidate='';stableFrames=0;currentGesture='';$('recognitionState').textContent='손을 찾고 있어요';$('recognitionHelp').textContent='손 전체를 카메라 안에 보여 주세요.';$('stateLed').classList.remove('active');$('cameraHint').textContent='SHOW YOUR HAND';$('confidenceBar').style.width='0%';$('confidenceText').textContent='—';return}
+ if(!p){candidate='';stableFrames=0;recentClassifications=[];currentGesture='';$('recognitionState').textContent='손을 찾고 있어요';$('recognitionHelp').textContent='손 전체를 카메라 안에 보여 주세요.';$('stateLed').classList.remove('active');$('cameraHint').textContent='SHOW YOUR HAND';$('confidenceBar').style.width='0%';$('confidenceText').textContent='—';return}
  const xs=p.map(a=>a.x*w),ys=p.map(a=>a.y*h),pad=Math.max(w*.035,16);
  const x0=Math.max(0,Math.min(...xs)-pad),y0=Math.max(0,Math.min(...ys)-pad),x1=Math.min(w,Math.max(...xs)+pad),y1=Math.min(h,Math.max(...ys)+pad);
  ctx.save();ctx.strokeStyle='#a7ed6b';ctx.lineWidth=Math.max(3,w/240);ctx.shadowColor='#a7ed6b';ctx.shadowBlur=12;ctx.strokeRect(x0,y0,x1-x0,y1-y0);ctx.shadowBlur=0;
