@@ -1,6 +1,6 @@
 (()=> {
 const $=id=>document.getElementById(id), video=$('inputVideo'),canvas=$('outputCanvas'),ctx=canvas.getContext('2d');
-let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',recentClassifications=[],currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,confirmed=false,logs=[],cameraBusy=false;
+let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',recentClassifications=[],currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,quantity=1,cart=[],confirmed=false,logs=[],cameraBusy=false;
 const gestures={
  point:{label:'검지 가리키기',icon:'☝️',phrase:'이것을 원해요'},
  open:{label:'손바닥 펴기',icon:'✋',phrase:'잠시만 기다려 주세요'},
@@ -140,7 +140,7 @@ function renderCart(){
  $('cartCount').textContent=cart.reduce((sum,item)=>sum+item.qty,0)+'개';
 }
 function confirmKiosk(){
- if(!cart.length){addToCart();return}
+ if(!cart.length){$('kioskStatus').textContent='먼저 메뉴를 선택하고 장바구니에 담아 주세요.';toast('장바구니가 비어 있어요.');return}
  const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
  $('kioskStatus').textContent='주문 내역 확인: '+cart.map(item=>item.name+' '+item.qty+'개').join(', ')+'. 총 '+total.toLocaleString('ko-KR')+'원. 데모이므로 실제 주문은 진행되지 않습니다.';
  record('주문 내역 확인 · '+total.toLocaleString('ko-KR')+'원','데모 확인');toast('주문 내역을 확인했어요. 실제 주문은 진행되지 않습니다.');
