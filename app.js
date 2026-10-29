@@ -61,7 +61,11 @@ function drawResults(res){
  ctx.strokeStyle='#b9ef95';ctx.lineWidth=Math.max(2,w/360);for(const [a,b] of links){ctx.beginPath();ctx.moveTo(p[a].x*w,p[a].y*h);ctx.lineTo(p[b].x*w,p[b].y*h);ctx.stroke()}
  for(const a of p){ctx.beginPath();ctx.arc(a.x*w,a.y*h,Math.max(2,w/190),0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#1c5a43';ctx.lineWidth=2;ctx.stroke()}
  ctx.restore();
- const g=classify(p);
+ const rawGesture=classify(p);
+ recentClassifications.push(rawGesture);if(recentClassifications.length>9)recentClassifications.shift();
+ const votes={};for(const item of recentClassifications){if(item)votes[item]=(votes[item]||0)+1;}
+ const best=Object.keys(votes).sort((a,b)=>votes[b]-votes[a])[0];
+ const g=best&&votes[best]>=6?best:null;
  if(!g){candidate='';stableFrames=0;$('recognitionState').textContent='동작을 구분 중';$('recognitionHelp').textContent='손 모양을 조금 더 분명하게 유지해 주세요.';$('confidenceBar').style.width='25%';$('confidenceText').textContent='분석 중';return}
  if(g===candidate)stableFrames++;else{candidate=g;stableFrames=1;candidateStart=performance.now()}
  const ready=stableFrames>=8;
