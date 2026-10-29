@@ -1,1 +1,154 @@
-(()=>{const $=id=>document.getElementById(id),v=$('inputVideo'),c=$('outputCanvas'),x=c.getContext('2d');let hands,cam,mode='communication',last='',n=0,at=0,start=0,phrase='도와주세요',sel=0,confirmed=false,logs=[];const names={point:'검지 가리키기',open:'손바닥 펴기',fist:'주먹 쥐기',peace:'브이',thumb:'엄지 올리기'},icons={point:'☝️',open:'✋',fist:'✊',peace:'✌️',thumb:'👍'},phrases={point:'이것을 원해요',open:'잠시만 기다려 주세요',fist:'아니요 / 취소할게요',peace:'도와주세요',thumb:'네, 알겠습니다'};function msg(s){const t=$('toast');t.textContent=s;t.hidden=false;setTimeout(()=>t.hidden=true,2400)}function esc(s){return String(s).replace(/[&<>]/g,a=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[a]))}function log(s,status='안정 인식',ms='—'){logs.unshift({t:new Date(),s,status,ms});logs=logs.slice(0,100);$('metricRecognized').textContent=logs.filter(a=>a.status==='안정 인식').length;let vals=logs.filter(a=>typeof a.ms==='number').map(a=>a.ms);$('metricLatency').textContent=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):'—';$('eventLog').innerHTML=logs.slice(0,8).map(a=>'<div class="log-row"><span class="log-time">'+a.t.toLocaleTimeString('ko-KR')+'</span><span class="log-label">'+esc(a.s)+'</span><span class="log-status">'+a.status+(typeof a.ms==='number'?' · '+a.ms+'ms':'')+'</span></div>').join('')||'<div class="log-empty">아직 기록이 없어요.</div>'}function classify(p){let f=[[8,6],[12,10],[16,14],[20,18]].map(a=>p[a[0]].y<p[a[1]].y-.02),k=f.filter(Boolean).length,t=Math.abs(p[4].x-p[2].x)>.08&&Math.hypot(p[4].x-p[5].x,p[4].y-p[5].y)>Math.hypot(p[3].x-p[5].x,p[3].y-p[5].y)*1.1;if(k>=4)return'open';if(k===0&&!t)return'fist';if(f[0]&&f[1]&&!f[2]&&!f[3])return'peace';if(f[0]&&!f[1]&&!f[2]&&!f[3])return'point';if(t&&k<=1)return'thumb';return null}function result(r){if(!v.videoWidth)return;c.width=v.videoWidth;c.height=v.videoHeight;x.clearRect(0,0,c.width,c.height);if($('showPreview').classList.contains('on'))x.drawImage(r.image,0,0,c.width,c.height);else{x.fillStyle='#15231d';x.fillRect(0,0,c.width,c.height)}let p=r.multiHandLandmarks&&r.multiHandLandmarks[0];if(!p){last='';n=0;$('recognitionState').textContent='손 대기 중';return}const g=classify(p);if(!g){last='';n=0;return}if(g===last)n++;else{last=g;n=1;start=performance.now()}$('recognitionState').textContent=n>=7?'동작 안정화':'프레임 확인 '+n+'/7';$('recognitionOutput').textContent=icons[g]+' '+names[g];$('confidenceBar').style.width=(n>=7?'85%':'45%');$('confidenceText').textContent=n>=7?'85%':'확인 중';if(n>=7&&performance.now()-at>1300){at=performance.now();let ms=Math.round(performance.now()-start);log(icons[g]+' '+names[g],'안정 인식',ms);act(g);n=0;last=''}}function items(){return [...document.querySelectorAll('.menu-item')]}function choose(i){let a=items();sel=(i+a.length)%a.length;a.forEach((b,j)=>b.classList.toggle('selected',j===sel));confirmed=false;$('kioskStatus').innerHTML='현재 선택: <strong>'+esc(a[sel].dataset.item)+'</strong>'}function help(){ $('kioskStatus').innerHTML='도움 요청: <strong>직원에게 도움이 필요하다고 알려주세요.</strong> 실제 호출은 되지 않아요.';log('도움 요청','데모 표시');msg('도움 요청 화면을 표시했어요.')}function cancel(){choose(0);$('kioskStatus').innerHTML='선택이 취소됐어요. <strong>음료</strong>로 돌아왔어요.';log('키오스크 취소','취소 완료')}function confirm(){let b=items()[sel];if(b.dataset.item==='도움 요청'){help();return}confirmed=true;$('kioskStatus').innerHTML='선택 확인: <strong>'+esc(b.dataset.item)+'</strong>. 엄지로 데모 완료, 주먹으로 취소하세요.';log('선택 확인: '+b.dataset.item,'확인 대기')}function act(g){if(mode==='communication'){phrase=phrases[g];$('recognitionOutput').textContent=icons[g]+' '+phrase;document.querySelectorAll('.phrase').forEach(p=>p.classList.toggle('active',p.dataset.phrase===phrase));if($('autoSpeak').classList.contains('on'))speak(phrase)}else if(mode==='kiosk'){if(g==='point')choose(sel+1);if(g==='open')confirm();if(g==='fist')cancel();if(g==='peace')help();if(g==='thumb'){if(confirmed){msg('데모 선택 완료. 결제는 진행되지 않아요.');log('데모 완료: '+items()[sel].dataset.item,'완료')}else confirm()}}else if(g==='peace')msg('도움 요청 제스처가 인식됐어요.')}function speak(s){if(!window.speechSynthesis)return msg('음성 읽기를 지원하지 않는 브라우저예요.');speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);u.lang='ko-KR';speechSynthesis.speak(u)}async function begin(){try{if(!window.Hands||!window.Camera)throw Error('인식 모듈을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.');hands=new Hands({locateFile:f=>'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/'+f});hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:.65,minTrackingConfidence:.6});hands.onResults(result);cam=new Camera(v,{onFrame:async()=>hands.send({image:v}),width:640,height:480});await cam.start();$('cameraPlaceholder').classList.add('hidden');$('stopCamera').disabled=false;$('startCamera').disabled=true;$('startCamera').textContent='카메라 실행 중';$('modelTag').textContent='MODEL READY';$('topStatus').textContent='카메라 연결됨';$('statusDot').classList.add('live');msg('카메라가 연결됐어요. 손동작을 보여 주세요.')}catch(e){msg(e.message||'카메라 권한을 확인해 주세요.');$('startCamera').disabled=false}}async function stop(){if(cam){cam.stop();cam=null}if(hands){await hands.close();hands=null}$('cameraPlaceholder').classList.remove('hidden');$('stopCamera').disabled=true;$('startCamera').disabled=false;$('startCamera').textContent='카메라 시작하기';$('modelTag').textContent='MODEL OFF';$('topStatus').textContent='카메라 연결 전';$('statusDot').classList.remove('live');x.clearRect(0,0,c.width,c.height)}$('startCamera').onclick=begin;$('stopCamera').onclick=stop;$('speakOutput').onclick=()=>speak(phrase);document.querySelectorAll('.mode-tab').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('.mode-tab').forEach(q=>q.classList.toggle('active',q===b));document.querySelectorAll('.mode-content').forEach(q=>q.classList.toggle('active',q.id===mode+'Panel'))});document.querySelectorAll('.menu-item').forEach((b,i)=>b.onclick=()=>choose(i));$('kioskConfirm').onclick=confirm;$('kioskCancel').onclick=cancel;$('kioskHelp').onclick=help;['autoSpeak','showPreview'].forEach(id=>$(id).onclick=()=>{let b=$(id);b.classList.toggle('on');b.setAttribute('aria-checked',String(b.classList.contains('on')))});$('exportLog').onclick=()=>{if(!logs.length)return msg('내보낼 기록이 없어요.');let rows=[['time','event','status','latency_ms'],...logs.slice().reverse().map(a=>[a.t.toISOString(),a.s,a.status,a.ms])],csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n'),url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='handlink-session-log.csv';a.click();URL.revokeObjectURL(url)};window.addEventListener('beforeunload',()=>cam&&cam.stop())})();
+(()=> {
+const $=id=>document.getElementById(id), video=$('inputVideo'),canvas=$('outputCanvas'),ctx=canvas.getContext('2d');
+let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,confirmed=false,logs=[],cameraBusy=false;
+const gestures={
+ point:{label:'검지 가리키기',icon:'☝️',phrase:'이것을 원해요'},
+ open:{label:'손바닥 펴기',icon:'✋',phrase:'잠시만 기다려 주세요'},
+ fist:{label:'주먹 쥐기',icon:'✊',phrase:'아니요 / 취소할게요'},
+ peace:{label:'브이',icon:'✌️',phrase:'도와주세요'},
+ thumb:{label:'엄지 올리기',icon:'👍',phrase:'네, 알겠습니다'},
+ three:{label:'세 손가락',icon:'🤟',phrase:'다시 설명해 주세요'},
+ pinch:{label:'엄지와 검지 모으기',icon:'👌',phrase:'괜찮아요'},
+ four:{label:'네 손가락',icon:'🖖',phrase:'메뉴 4 선택'}
+};
+const kioskGesture={point:0,peace:1,three:2,four:3};
+const menu=[...document.querySelectorAll('.food-item')];
+function toast(s){const t=$('toast');t.textContent=s;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.hidden=true,2500)}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function extended(p,tip,pip){return p[tip].y < p[pip].y-.018}
+function classify(p){
+ const index=extended(p,8,6),middle=extended(p,12,10),ring=extended(p,16,14),pink=extended(p,20,18);
+ const thumbSide=dist(p[4],p[5])>dist(p[3],p[5])*1.18;
+ const thumbUp=p[4].y < p[3].y-.035 && (Math.abs(p[4].x-p[3].x)<.16 || p[4].y<p[5].y-.09);
+ const others=[index,middle,ring,pink].filter(Boolean).length;
+ const palmWidth=Math.max(dist(p[5],p[17]),.001);
+ const pinch=dist(p[4],p[8])/palmWidth < .34;
+ if(thumbUp && !index && !middle && !ring && !pink) return 'thumb';
+ if(pinch && index && !middle && !ring && !pink) return 'pinch';
+ if(index&&middle&& !ring&&!pink) return 'peace';
+ if(index&&middle&&ring&&!pink) return 'three';
+ if(index&&middle&&ring&&pink&&!thumbSide) return 'four';
+ if(index&&!middle&&!ring&&!pink) return 'point';
+ if(index&&middle&&ring&&pink) return 'open';
+ if(!index&&!middle&&!ring&&!pink&&!thumbSide) return 'fist';
+ if(others===4)return 'open';
+ if(others===0)return 'fist';
+ return null;
+}
+function drawResults(res){
+ if(!video.videoWidth)return;
+ const w=video.videoWidth,h=video.videoHeight;
+ if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
+ ctx.clearRect(0,0,w,h);ctx.drawImage(res.image,0,0,w,h);
+ const p=res.multiHandLandmarks?.[0];
+ if(!p){candidate='';stableFrames=0;currentGesture='';$('recognitionState').textContent='손을 찾고 있어요';$('recognitionHelp').textContent='손 전체를 카메라 안에 보여 주세요.';$('stateLed').classList.remove('active');$('cameraHint').textContent='SHOW YOUR HAND';$('confidenceBar').style.width='0%';$('confidenceText').textContent='—';return}
+ const xs=p.map(a=>a.x*w),ys=p.map(a=>a.y*h),pad=Math.max(w*.035,16);
+ const x0=Math.max(0,Math.min(...xs)-pad),y0=Math.max(0,Math.min(...ys)-pad),x1=Math.min(w,Math.max(...xs)+pad),y1=Math.min(h,Math.max(...ys)+pad);
+ ctx.save();ctx.strokeStyle='#a7ed6b';ctx.lineWidth=Math.max(3,w/240);ctx.shadowColor='#a7ed6b';ctx.shadowBlur=12;ctx.strokeRect(x0,y0,x1-x0,y1-y0);ctx.shadowBlur=0;
+ ctx.fillStyle='#a7ed6b';ctx.fillRect(x0,y0,Math.min(155,w-x0),Math.max(25,h/23));ctx.fillStyle='#101b17';ctx.font='bold '+Math.max(12,w/55)+'px sans-serif';ctx.fillText('HAND DETECTED',x0+8,y0+Math.max(17,h/34));
+ const links=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+ ctx.strokeStyle='#b9ef95';ctx.lineWidth=Math.max(2,w/360);for(const [a,b] of links){ctx.beginPath();ctx.moveTo(p[a].x*w,p[a].y*h);ctx.lineTo(p[b].x*w,p[b].y*h);ctx.stroke()}
+ for(const a of p){ctx.beginPath();ctx.arc(a.x*w,a.y*h,Math.max(2,w/190),0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#1c5a43';ctx.lineWidth=2;ctx.stroke()}
+ ctx.restore();
+ const g=classify(p);
+ if(!g){candidate='';stableFrames=0;$('recognitionState').textContent='동작을 구분 중';$('recognitionHelp').textContent='손 모양을 조금 더 분명하게 유지해 주세요.';$('confidenceBar').style.width='25%';$('confidenceText').textContent='분석 중';return}
+ if(g===candidate)stableFrames++;else{candidate=g;stableFrames=1;candidateStart=performance.now()}
+ const ready=stableFrames>=8;
+ $('recognitionState').textContent=ready?'동작 인식 완료':'동작 확인 중 · '+Math.min(stableFrames,8)+'/8';
+ $('recognitionHelp').textContent=ready?'인식 결과를 확인하세요.':'같은 손 모양을 잠깐 유지해 주세요.';
+ $('recognitionOutput').textContent=gestures[g].icon+' '+gestures[g].label;
+ $('confidenceBar').style.width=(Math.min(stableFrames/8,1)*100)+'%';$('confidenceText').textContent=ready?'안정 인식':Math.round(stableFrames/8*100)+'%';
+ $('stateLed').classList.toggle('active',ready);$('cameraHint').textContent=ready?'GESTURE RECOGNIZED':'TRACKING HAND';
+ if(ready&&g!==currentGesture&&performance.now()-lastTrigger>600){currentGesture=g;lastTrigger=performance.now();const ms=Math.round(performance.now()-candidateStart);record(gestures[g].icon+' '+gestures[g].label,'안정 인식',ms);activate(g)}
+}
+function record(label,status='안정 인식',ms='—'){
+ logs.unshift({time:new Date(),label,status,ms});logs=logs.slice(0,100);
+ $('metricRecognized').textContent=logs.filter(a=>a.status==='안정 인식').length;
+ const nums=logs.filter(a=>typeof a.ms==='number').map(a=>a.ms);
+ $('metricLatency').textContent=nums.length?Math.round(nums.reduce((a,b)=>a+b,0)/nums.length):'—';
+ $('metricLast').textContent=logs[0]?.status||'—';
+ $('eventLog').innerHTML=logs.slice(0,20).map(a=>'<div class="log-row"><span class="log-time">'+a.time.toLocaleTimeString('ko-KR')+'</span><span class="log-label">'+escapeHtml(a.label)+'</span><span class="log-status">'+a.status+(typeof a.ms==='number'?' · '+a.ms+'ms':'')+'</span></div>').join('')||'<p class="empty-log">아직 기록이 없어요.</p>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}
+function speakOnce(text){
+ if(!autoSpeak||!text||text===lastSpoken)return;
+ if(!('speechSynthesis'in window))return;
+ lastSpoken=text;speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(text);utterance.lang='ko-KR';utterance.rate=.92;speechSynthesis.speak(utterance);
+}
+function updatePhrase(g){
+ const phrase=gestures[g].phrase;currentPhrase=phrase;
+ $('messageOutput').textContent=phrase;
+ document.querySelectorAll('.phrase-row').forEach(el=>el.classList.toggle('active',el.dataset.gesture===g));
+ speakOnce(phrase);
+}
+function choose(i){
+ selected=(i+menu.length)%menu.length;confirmed=false;
+ menu.forEach((b,j)=>b.classList.toggle('selected',j===selected));
+ const b=menu[selected];$('kioskSelected').textContent=b.querySelector('.food-emoji').textContent+'　'+b.dataset.item;
+ $('kioskPrice').textContent=b.dataset.price==='0'?'안내':Number(b.dataset.price).toLocaleString('ko-KR')+'원';
+ $('kioskStatus').textContent='선택 '+b.dataset.number+'번: '+b.dataset.item+'. 엄지 올리기로 확인하세요.';
+}
+function confirmKiosk(){
+ const b=menu[selected];
+ if(b.dataset.item==='도움 요청'){$('kioskStatus').textContent='도움 안내: 직원에게 도움이 필요하다고 말해 주세요. 실제 호출은 되지 않습니다.';record('도움 안내 표시','데모');return}
+ confirmed=true;$('kioskStatus').textContent=b.dataset.item+' 선택을 확인했어요. 실제 주문은 진행되지 않습니다.';
+ record('선택 확인: '+b.dataset.item,'확인 완료');toast('선택을 확인했어요. 데모 화면입니다.');
+}
+function cancelKiosk(){choose(0);$('kioskStatus').textContent='선택을 취소했어요. 1번 음료로 돌아왔어요.';record('키오스크 취소','취소 완료')}
+function helpKiosk(){$('kioskStatus').textContent='도움 안내: 1~4번은 손가락 개수, 엄지는 확인, 주먹은 취소예요. 실제 호출은 되지 않습니다.';record('도움말 표시','데모');toast('손동작 안내를 표시했어요.')}
+function activate(g){
+ if(mode==='communication'){updatePhrase(g);return}
+ if(mode==='kiosk'){
+   if(Object.prototype.hasOwnProperty.call(kioskGesture,g)){choose(kioskGesture[g]);record('메뉴 '+(selected+1)+'번 선택','메뉴 선택');return}
+   if(g==='thumb'){confirmKiosk();return}
+   if(g==='fist'){cancelKiosk();return}
+   if(g==='open'){helpKiosk();return}
+   if(g==='pinch'){choose(selected===0?menu.length-1:selected-1);return}
+   return;
+ }
+ if(mode==='research')toast('인식 기록에 추가했어요: '+gestures[g].label);
+}
+async function startCamera(){
+ if(cameraBusy)return;cameraBusy=true;
+ try{
+  if(!window.Hands||!window.Camera)throw Error('손 인식 모듈을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.');
+  if(!navigator.mediaDevices?.getUserMedia)throw Error('이 브라우저에서 카메라를 사용할 수 없어요. HTTPS 주소로 접속해 주세요.');
+  hands=new Hands({locateFile:file=>'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/'+file});
+  hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:.68,minTrackingConfidence:.62});
+  hands.onResults(drawResults);
+  camera=new Camera(video,{onFrame:async()=>{if(hands)await hands.send({image:video})},width:640,height:480});
+  await camera.start();
+  $('cameraPlaceholder').classList.add('hidden');$('stopCamera').disabled=false;$('startCamera').disabled=true;
+  $('modelTag').textContent='실시간 인식';$('topStatus').textContent='카메라 연결됨';$('statusDot').classList.add('live');
+  $('recognitionState').textContent='손을 찾고 있어요';$('recognitionHelp').textContent='손 전체를 화면 안에 보여 주세요.';toast('카메라 연결 완료');
+ }catch(e){if(hands){try{await hands.close()}catch{}hands=null}camera=null;toast(e.message||'카메라 권한을 확인해 주세요.');$('recognitionState').textContent='연결에 실패했어요';$('recognitionHelp').textContent='카메라 권한과 HTTPS 연결을 확인해 주세요.'}
+ finally{cameraBusy=false}
+}
+async function stopCamera(){
+ if(camera){camera.stop();camera=null}if(hands){try{await hands.close()}catch{}hands=null}
+ $('cameraPlaceholder').classList.remove('hidden');$('stopCamera').disabled=true;$('startCamera').disabled=false;
+ $('modelTag').textContent='대기 중';$('topStatus').textContent='카메라 연결 전';$('statusDot').classList.remove('live');
+ $('recognitionState').textContent='대기 중';$('recognitionHelp').textContent='카메라를 시작하면 인식이 진행됩니다.';$('recognitionOutput').textContent='아직 인식된 동작이 없어요.';
+ $('cameraHint').textContent='WAITING FOR CAMERA';$('stateLed').classList.remove('active');$('confidenceBar').style.width='0%';$('confidenceText').textContent='—';ctx.clearRect(0,0,canvas.width,canvas.height);
+ candidate='';stableFrames=0;currentGesture='';
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+ mode=b.dataset.mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));document.querySelectorAll('.mode-content').forEach(p=>p.classList.toggle('active',p.id===mode+'Panel'));
+ if(mode==='kiosk')$('recognitionHelp').textContent='1~4개 손가락은 메뉴, 엄지는 확인, 주먹은 취소, 손바닥은 도움말입니다.';
+ else if(mode==='communication')$('recognitionHelp').textContent='동작을 유지하면 문구가 표시됩니다.';
+ else $('recognitionHelp').textContent='안정적으로 인식된 동작이 기록됩니다.';
+}));
+$('startCamera').addEventListener('click',startCamera);$('stopCamera').addEventListener('click',stopCamera);
+$('speakOutput').addEventListener('click',()=>{if(currentPhrase){lastSpoken='';speakOnce(currentPhrase)}else toast('먼저 손동작을 인식해 주세요.')});
+$('kioskConfirm').addEventListener('click',confirmKiosk);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);
+menu.forEach((b,i)=>b.addEventListener('click',()=>choose(i)));
+$('autoSpeak').addEventListener('click',()=>{autoSpeak=!autoSpeak;$('autoSpeak').classList.toggle('on',autoSpeak);$('autoSpeak').setAttribute('aria-checked',String(autoSpeak));if(!autoSpeak&&'speechSynthesis'in window)speechSynthesis.cancel()});
+$('exportLog').addEventListener('click',()=>{
+ if(!logs.length){toast('내보낼 기록이 없어요.');return}
+ const rows=[['time','event','status','stabilization_ms'],...logs.slice().reverse().map(a=>[a.time.toISOString(),a.label,a.status,a.ms])];
+ const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='handlink-session-log.csv';a.click();URL.revokeObjectURL(url);
+});
+window.addEventListener('beforeunload',()=>{if(camera)camera.stop();if('speechSynthesis'in window)speechSynthesis.cancel()});
+})();
