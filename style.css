@@ -29,3 +29,19 @@
 .cart-row-actions button{min-width:30px;min-height:30px;border-radius:8px;font-size:15px}
 .cart-row-actions .cart-remove{font-size:10px;padding:0 7px;color:#a13b32}
 @media(max-width:520px){.add-menu-form{grid-template-columns:1fr}.add-menu-form button{grid-column:auto}.cart-row{align-items:flex-start;flex-direction:column}.cart-row-actions{align-self:flex-end}}
+
+.step-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;margin:0 0 12px;background:#edf4e8;border-radius:10px;color:var(--green)}
+.step-banner span{font-size:13px;font-weight:900}.step-banner small{font-size:10px;color:var(--muted);text-align:right}
+.quantity-panel.step-active{background:#f0f7eb;border-radius:10px;padding:12px;margin-top:8px}
+.food-item.step-disabled{opacity:.62}
+.kiosk-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.kiosk-actions button{min-height:43px;display:inline-flex;align-items:center;gap:7px}
+.modal-backdrop[hidden]{display:none!important}
+.modal-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(15,28,22,.58);display:flex;align-items:center;justify-content:center;padding:18px}
+.dialog{position:relative;width:min(100%,460px);max-height:min(82vh,720px);overflow:auto;background:#fff;border-radius:20px;padding:26px;box-shadow:0 24px 80px #0003;color:var(--ink)}
+.dialog h3{font-size:22px;margin:5px 0 16px}.dialog ol{padding-left:22px;margin:0;line-height:1.8;font-size:14px}.dialog li{padding:4px 0}
+.dialog-close{position:absolute;right:13px;top:13px;border:0;background:#f0f3ee;border-radius:50%;width:36px;height:36px;font-size:24px;cursor:pointer}
+.dialog-done{margin-top:18px;width:100%;justify-content:center;min-height:44px}
+.order-summary{white-space:pre-wrap;font:inherit;font-size:14px;line-height:1.8;background:#f5f7f2;padding:14px;border-radius:12px}
+.three-finger-icon svg{width:31px;height:31px;display:block;color:var(--green)}
+@media(max-width:520px){.step-banner{align-items:flex-start;flex-direction:column}.step-banner small{text-align:left}.dialog{padding:22px 18px}}
