@@ -1,6 +1,6 @@
 (()=> {
 const $=id=>document.getElementById(id), video=$('inputVideo'),canvas=$('outputCanvas'),ctx=canvas.getContext('2d');
-let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',recentClassifications=[],currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,quantity=1,cart=[],confirmed=false,logs=[],cameraBusy=false;
+let hands=null,camera=null,mode='communication',candidate='',stableFrames=0,candidateStart=0,lastTrigger=0,currentGesture='',recentClassifications=[],currentPhrase='',lastSpoken='',autoSpeak=true,selected=0,quantity=1,cart=[],kioskStep='menu',logs=[],cameraBusy=false;
 const gestures={
  point:{label:'검지 가리키기',icon:'☝️',phrase:'이것을 원해요'},
  open:{label:'손바닥 펴기',icon:'✋',phrase:'잠시만 기다려 주세요'},
@@ -100,20 +100,37 @@ function updatePhrase(g){
  speakOnce(phrase);
 }
 function getMenu(){return [...document.querySelectorAll('.food-item')]}
+function setKioskStep(step){
+ kioskStep=step;
+ const labels={menu:'1. 메뉴 선택',confirmMenu:'2. 메뉴 확정',quantity:'3. 수량 선택',confirmQuantity:'4. 수량 확정'};
+ $('kioskStepLabel').textContent=labels[step]||labels.menu;
+ $('kioskConfirm').innerHTML=step==='confirmMenu'?'👍 메뉴 선택 확정':step==='quantity'?'👍 수량 확정':'👍 '+(step==='confirmQuantity'?'수량 확정 · 장바구니 담기':'선택 확정');
+ $('quantityPanel').classList.toggle('step-active',step==='quantity'||step==='confirmQuantity');
+ getMenu().forEach((b,i)=>b.classList.toggle('step-disabled',step==='quantity'||step==='confirmQuantity'));
+}
 function choose(i){
  menu=getMenu();if(!menu.length)return;
- selected=Math.max(0,Math.min(i,menu.length-1));quantity=Math.max(1,quantity);confirmed=false;
+ if(kioskStep!=='menu'&&kioskStep!=='confirmMenu'){toast('먼저 현재 단계의 선택을 확정해 주세요.');return}
+ selected=Math.max(0,Math.min(i,menu.length-1));quantity=1;
  menu.forEach((b,j)=>b.classList.toggle('selected',j===selected));
  const b=menu[selected];
  $('kioskSelected').textContent=b.querySelector('.food-emoji').textContent+'　'+b.dataset.item;
  $('kioskPrice').textContent=Number(b.dataset.price).toLocaleString('ko-KR')+'원';
  $('quantityValue').textContent=String(quantity);
- $('kioskStatus').textContent='선택 '+b.dataset.number+'번: '+b.dataset.item+'. 수량을 정하고 장바구니에 담으세요.';
+ setKioskStep('confirmMenu');
+ $('kioskStatus').textContent=b.dataset.item+'을(를) 선택했어요. 👍 엄지 올리기로 확정해 주세요.';
 }
 function changeQuantity(delta){
+ if(kioskStep!=='quantity'&&kioskStep!=='confirmQuantity'){toast('먼저 메뉴를 확정해 주세요.');return}
  quantity=Math.max(1,Math.min(20,quantity+delta));
  $('quantityValue').textContent=String(quantity);
- const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개를 선택했어요.';
+ setKioskStep('confirmQuantity');
+ const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개. 👍 엄지 올리기로 확정하면 장바구니에 담고 메뉴 선택으로 돌아갑니다.';
+}
+function selectQuantityByGesture(n){
+ if(kioskStep!=='quantity'&&kioskStep!=='confirmQuantity')return;
+ quantity=Math.max(1,Math.min(4,n));$('quantityValue').textContent=String(quantity);setKioskStep('confirmQuantity');
+ const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개를 선택했어요. 👍 엄지 올리기로 확정해 주세요.';
 }
 function addToCart(){
  menu=getMenu();const b=menu[selected];if(!b)return;
@@ -122,9 +139,36 @@ function addToCart(){
  if(found)found.qty=Math.min(99,found.qty+quantity);
  else cart.push({name:key,price:Number(b.dataset.price),emoji:b.querySelector('.food-emoji').textContent,qty:quantity});
  renderCart();record('장바구니 추가: '+key+' × '+quantity,'장바구니');
- $('kioskStatus').textContent=key+' '+quantity+'개를 장바구니에 담았어요.';
+ $('kioskStatus').textContent=key+' '+quantity+'개를 장바구니에 담았어요. 다음 메뉴를 선택할 수 있어요.';
  toast('장바구니에 추가했어요.');
 }
+function confirmKioskStep(){
+ if(kioskStep==='confirmMenu'){
+  setKioskStep('quantity');
+  $('kioskStatus').textContent='수량을 선택해 주세요. 손가락 1~4개로 수량을 정한 뒤 👍 엄지 올리기로 확정하세요.';
+  return;
+ }
+ if(kioskStep==='quantity'){
+  $('kioskStatus').textContent='손가락 1~4개 또는 화면의 +/− 버튼으로 수량을 정한 뒤 확정해 주세요.';
+  return;
+ }
+ if(kioskStep==='confirmQuantity'){
+  addToCart();quantity=1;$('quantityValue').textContent='1';setKioskStep('menu');
+  $('kioskStatus').textContent='장바구니에 담았어요. 다음 메뉴를 손가락 1~4개로 선택해 주세요.';
+  return;
+ }
+ $('kioskStatus').textContent='메뉴를 손가락 1~4개 또는 화면에서 선택해 주세요.';
+}
+function confirmKiosk(){
+ if(!cart.length){$('kioskStatus').textContent='장바구니가 비어 있어요. 메뉴를 선택하고 수량을 확정해 주세요.';toast('장바구니가 비어 있어요.');return}
+ const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
+ $('orderSummary').textContent=cart.map(item=>item.emoji+' '+item.name+' × '+item.qty+'개 · '+(item.price*item.qty).toLocaleString('ko-KR')+'원').join('\n')+'\n\n합계 '+total.toLocaleString('ko-KR')+'원';
+ $('orderModal').hidden=false;$('orderModalClose').focus();
+ record('주문 내역 확인 · '+total.toLocaleString('ko-KR')+'원','데모 확인');
+}
+function cancelKiosk(){cart=[];quantity=1;$('quantityValue').textContent='1';renderCart();setKioskStep('menu');choose(0);setKioskStep('menu');$('kioskStatus').textContent='장바구니를 비웠어요. 메뉴를 선택해 주세요.';record('장바구니 비우기','취소 완료')}
+function helpKiosk(){$('helpModal').hidden=false;$('helpModalClose').focus();record('도움말 표시','데모')}
+function closeModal(id){$(id).hidden=true}
 function renderCart(){
  const root=$('cartItems');
  if(!cart.length){root.innerHTML='<p class="cart-empty">아직 담은 메뉴가 없어요. 메뉴를 선택하고 추가해 주세요.</p>';}
@@ -150,12 +194,24 @@ function helpKiosk(){$('kioskStatus').textContent='도움말: 손가락 1~4개�
 function activate(g){
  if(mode==='communication'){updatePhrase(g);return}
  if(mode==='kiosk'){
+  if(g==='open'){helpKiosk();return}
+  if(g==='pinch'){helpKiosk();return}
+  if(kioskStep==='menu'){
    if(Object.prototype.hasOwnProperty.call(kioskGesture,g)){choose(kioskGesture[g]);record('메뉴 '+(selected+1)+'번 선택','메뉴 선택');return}
-   if(g==='thumb'){confirmKiosk();return}
-   if(g==='fist'){cancelKiosk();return}
-   if(g==='open'){helpKiosk();return}
-   if(g==='pinch'){addToCart();return}
+   if(g==='thumb')toast('먼저 손가락 1~4개로 메뉴를 선택해 주세요.');
    return;
+  }
+  if(kioskStep==='confirmMenu'){
+   if(g==='thumb'){confirmKioskStep();return}
+   if(Object.prototype.hasOwnProperty.call(kioskGesture,g)){choose(kioskGesture[g]);return}
+   return;
+  }
+  if(kioskStep==='quantity'||kioskStep==='confirmQuantity'){
+   if(Object.prototype.hasOwnProperty.call(kioskGesture,g)){selectQuantityByGesture(kioskGesture[g]+1);record('수량 '+quantity+'개 선택','수량 선택');return}
+   if(g==='thumb'){confirmKioskStep();return}
+   if(g==='fist'){cancelKiosk();return}
+   return;
+  }
  }
  if(mode==='research')toast('인식 기록에 추가했어요: '+gestures[g].label);
 }
@@ -185,13 +241,13 @@ async function stopCamera(){
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
  mode=b.dataset.mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));document.querySelectorAll('.mode-content').forEach(p=>p.classList.toggle('active',p.id===mode+'Panel'));
- if(mode==='kiosk')$('recognitionHelp').textContent='손가락 1~4개로 메뉴 선택, 👌 장바구니 추가, 👍 주문 내역 확인, 주먹은 비우기입니다.';
+ if(mode==='kiosk')$('recognitionHelp').textContent='손가락 1~4개로 메뉴 선택·수량 지정, 👍 엄지 올리기로 각 단계 확정. ✋ 또는 👌로 도움말을 열 수 있어요.';
  else if(mode==='communication')$('recognitionHelp').textContent='동작을 유지하면 문구가 표시됩니다.';
  else $('recognitionHelp').textContent='안정적으로 인식된 동작이 기록됩니다.';
 }));
 $('startCamera').addEventListener('click',startCamera);$('stopCamera').addEventListener('click',stopCamera);
 $('speakOutput').addEventListener('click',()=>{if(currentPhrase){lastSpoken='';speakOnce(currentPhrase)}else toast('먼저 손동작을 인식해 주세요.')});
-$('kioskConfirm').addEventListener('click',confirmKiosk);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);
+$('kioskConfirm').addEventListener('click',confirmKioskStep);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);$('helpModalClose').addEventListener('click',()=>closeModal('helpModal'));$('orderModalClose').addEventListener('click',()=>closeModal('orderModal'));document.querySelectorAll('[data-modal-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.dataset.modalClose)));document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('helpModal');closeModal('orderModal')}});
 menu.forEach((b,i)=>b.addEventListener('click',()=>choose(i)));
 $('quantityMinus').addEventListener('click',()=>changeQuantity(-1));$('quantityPlus').addEventListener('click',()=>changeQuantity(1));
 $('addToCart').addEventListener('click',addToCart);
