@@ -1,34 +1,21 @@
-# TRACE — 암기 과목 시험 대비 웹사이트
+# HANDLINK
+**Hand Gesture Communication & Accessible Interface**
 
-교과서·수업 프린트를 등록하고 원문에 근거한 문항을 생성해 퀴즈·빈칸 복원·개념 비교로 학습하는 정적 웹사이트입니다.
+HANDLINK is a browser-based prototype that connects a small set of hand gestures to communication phrases and a simulated accessible kiosk.
 
-## 포함된 기능
-- **대시보드:** 자료 수, 등록 문항, 복습 대상, 정답률
-- **시험 범위 & 자료:** 파일 등록, 직접 텍스트 입력, 원문 확인 및 자료 관리
-- **문항 제작실:** 원문 기반 문항 자동 등록, 질문·정답·해설·원문 근거 편집, 직접 추가 및 삭제
-- **통합 학습실:** 객관식·OX·단답형, 빈칸 복원, 개념 비교, 확신도 기록
-- **학습 분석:** 정답률, 풀이 기록, 확신도, 문항별 상태
-- **복습 계획:** 오답 및 미학습 문항 중심 복습
+## Features
+- Webcam-based hand landmark recognition using MediaPipe Hands.
+- Five demo gestures: pointing, open palm, fist, V sign, and thumbs-up.
+- Temporal stabilization: a gesture must persist across multiple frames before it triggers an action.
+- Communication board with optional Korean text-to-speech.
+- Simulated kiosk navigation, confirmation, cancellation, and help screen.
+- Session event log and CSV export for exploratory performance testing.
 
-## 무료 문항 생성
-- 외부 유료 AI API나 API 키를 사용하지 않습니다. 문항은 브라우저에서 실행되는 JavaScript 규칙 기반 엔진으로 생성합니다.
-- 빈칸과 핵심 용어 회상은 원문에서 추출한 표현을 이용합니다. 객관식 오답 선택지는 자료에서 추출한 용어를 조합하며, 개념 비교 문항은 관련 원문을 함께 제시합니다.
-- 이 방식은 생성형 AI처럼 문맥을 깊게 추론하지 못합니다. 자동 추출된 용어, 객관식 선택지, 개념 비교 기준과 정답은 학습 전에 확인·수정해야 합니다.
-- PDF·DOCX·이미지 텍스트 추출은 브라우저에서 외부 라이브러리를 불러올 수 있을 때 동작할 수 있습니다. TXT·MD·CSV는 브라우저에서 직접 읽습니다.
-- 문제 생성, 저장, 복습은 브라우저에서 실행되므로 별도 AI 서버를 배포할 필요가 없습니다. GitHub Pages에서 정적 사이트로 운영할 수 있습니다.
+## Run
+Open the GitHub Pages site over HTTPS and allow camera access. The first run needs an internet connection to load MediaPipe libraries from jsDelivr. A compatible webcam and modern browser are recommended.
 
-## 개인 코드와 데이터
-- 개인 코드는 같은 브라우저 안에서 학습 공간을 구분하는 용도입니다. 계정 인증이나 암호화가 아니며 다른 기기와 동기화되지 않습니다.
-- 자료, 문항, 풀이 기록은 브라우저의 localStorage에 저장됩니다. 브라우저 데이터 삭제 시 기록이 사라질 수 있으므로 정기적으로 학습 데이터를 내보내 백업하세요.
-- 개인정보나 공유하면 안 되는 민감한 자료는 업로드하지 않는 것이 좋습니다.
+## Research notes
+Try changing one condition at a time: camera distance, lighting, or how long a gesture is held. Record known intended gestures separately and compare them with recognition events before calculating accuracy. Event timing alone is not a verified accuracy score.
 
-## 실행
-`index.html`을 브라우저에서 열거나 GitHub Pages를 활성화해 정적 웹사이트로 배포할 수 있습니다.
-
-## 다음 개발 단계
-1. 원문에서 핵심 용어와 정의를 추출하는 규칙 개선
-2. 객관식 오답의 타당성 및 중복 문항 검사 강화
-3. 문서 추출 결과 확인·수정 흐름 개선
-4. 실제 시험 일정 기반 간격 복습 및 자동화 테스트
-
-TRACE · Study with Purpose
+## Limitations
+This is a prototype, not a replacement for a full sign language system or professional augmentative and alternative communication device. The kiosk is a simulation only; no real orders, payments, or staff calls are sent. Camera frames are processed in the browser and are not uploaded by this application.
