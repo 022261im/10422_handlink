@@ -247,7 +247,7 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
 }));
 $('startCamera').addEventListener('click',startCamera);$('stopCamera').addEventListener('click',stopCamera);
 $('speakOutput').addEventListener('click',()=>{if(currentPhrase){lastSpoken='';speakOnce(currentPhrase)}else toast('먼저 손동작을 인식해 주세요.')});
-$('kioskConfirm').addEventListener('click',confirmKioskStep);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);$('helpModalClose').addEventListener('click',()=>closeModal('helpModal'));$('orderModalClose').addEventListener('click',()=>closeModal('orderModal'));document.querySelectorAll('[data-modal-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.dataset.modalClose)));document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('helpModal');closeModal('orderModal')}});
+$('kioskConfirm').addEventListener('click',confirmKioskStep);$('viewOrder').addEventListener('click',confirmKiosk);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);$('helpModalClose').addEventListener('click',()=>closeModal('helpModal'));$('orderModalClose').addEventListener('click',()=>closeModal('orderModal'));document.querySelectorAll('[data-modal-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.dataset.modalClose)));document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('helpModal');closeModal('orderModal')}});
 menu.forEach((b,i)=>b.addEventListener('click',()=>choose(i)));
 $('quantityMinus').addEventListener('click',()=>changeQuantity(-1));$('quantityPlus').addEventListener('click',()=>changeQuantity(1));
 $('addToCart').addEventListener('click',addToCart);
