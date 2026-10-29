@@ -6,7 +6,7 @@ const gestures={
  open:{label:'손바닥 펴기',icon:'✋',phrase:'잠시만 기다려 주세요'},
  fist:{label:'주먹 쥐기',icon:'✊',phrase:'아니요 / 취소할게요'},
  peace:{label:'브이',icon:'✌️',phrase:'도와주세요'},
- thumb:{label:'엄지 올리기',icon:'👍',phrase:'네, 알겠습니다'},
+ thumb:{label:'👍',icon:'👍',phrase:'네, 알겠습니다'},
  three:{label:'세 손가락',icon:'🤟',phrase:'다시 설명해 주세요'},
  pinch:{label:'엄지와 검지 모으기',icon:'👌',phrase:'괜찮아요'},
  four:{label:'네 손가락',icon:'🖖',phrase:'메뉴 4 선택'}
@@ -39,7 +39,7 @@ function classify(p){
  // and the other three fingers to remain extended.
  const indexFolded=angleAt(p[5],p[6],p[8])<155 || dist(p[8],p[4])/palm<1.25;
  if(thumbIndex<1.75&&indexFolded&&middle&&ring&&pink)return 'pinch';
- // "엄지 올리기": thumb is clearly above the wrist while the four fingers are curled.
+ // "👍": thumb is clearly above the wrist while the four fingers are curled.
  if(thumbRaised&&otherCurled&&dist(p[4],p[2])>palm*.45)return 'thumb';
  if(index&&middle&&ring&&!pink)return 'three';
  if(index&&middle&&!ring&&!pink)return 'peace';
@@ -118,19 +118,19 @@ function choose(i){
  $('kioskPrice').textContent=Number(b.dataset.price).toLocaleString('ko-KR')+'원';
  $('quantityValue').textContent=String(quantity);
  setKioskStep('confirmMenu');
- $('kioskStatus').textContent=b.dataset.item+'을(를) 선택했어요. 👍 엄지 올리기로 확정해 주세요.';
+ $('kioskStatus').textContent=b.dataset.item+'을(를) 선택했어요. 👍 👍로 확정해 주세요.';
 }
 function changeQuantity(delta){
  if(kioskStep!=='quantity'&&kioskStep!=='confirmQuantity'){toast('먼저 메뉴를 확정해 주세요.');return}
  quantity=Math.max(1,Math.min(20,quantity+delta));
  $('quantityValue').textContent=String(quantity);
  setKioskStep('confirmQuantity');
- const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개. 👍 엄지 올리기로 확정하면 장바구니에 담고 메뉴 선택으로 돌아갑니다.';
+ const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개. 👍 👍로 확정하면 장바구니에 담고 메뉴 선택으로 돌아갑니다.';
 }
 function selectQuantityByGesture(n){
  if(kioskStep!=='quantity'&&kioskStep!=='confirmQuantity')return;
  quantity=Math.max(1,Math.min(4,n));$('quantityValue').textContent=String(quantity);setKioskStep('confirmQuantity');
- const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개를 선택했어요. 👍 엄지 올리기로 확정해 주세요.';
+ const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개를 선택했어요. 👍 👍로 확정해 주세요.';
 }
 function addToCart(){
  menu=getMenu();const b=menu[selected];if(!b)return;
@@ -145,7 +145,7 @@ function addToCart(){
 function confirmKioskStep(){
  if(kioskStep==='confirmMenu'){
   setKioskStep('quantity');
-  $('kioskStatus').textContent='수량을 선택해 주세요. 손가락 1~4개로 수량을 정한 뒤 👍 엄지 올리기로 확정하세요.';
+  $('kioskStatus').textContent='수량을 선택해 주세요. 손가락 1~4개로 수량을 정한 뒤 👍 👍로 확정하세요.';
   return;
  }
  if(kioskStep==='quantity'){
@@ -241,7 +241,7 @@ async function stopCamera(){
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
  mode=b.dataset.mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));document.querySelectorAll('.mode-content').forEach(p=>p.classList.toggle('active',p.id===mode+'Panel'));
- if(mode==='kiosk')$('recognitionHelp').textContent='손가락 1~4개로 메뉴 선택·수량 지정, 👍 엄지 올리기로 각 단계 확정. ✋ 또는 👌로 도움말을 열 수 있어요.';
+ if(mode==='kiosk')$('recognitionHelp').textContent='손가락 1~4개로 메뉴 선택·수량 지정, 👍 👍로 각 단계 확정. ✋ 또는 👌로 도움말을 열 수 있어요.';
  else if(mode==='communication')$('recognitionHelp').textContent='동작을 유지하면 문구가 표시됩니다.';
  else $('recognitionHelp').textContent='안정적으로 인식된 동작이 기록됩니다.';
 }));
