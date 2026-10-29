@@ -12,7 +12,7 @@ const gestures={
  four:{label:'네 손가락',icon:'🖖',phrase:'메뉴 4 선택'}
 };
 const kioskGesture={point:0,peace:1,three:2,four:3};
-const menu=[...document.querySelectorAll('.food-item')];
+let menu=[...document.querySelectorAll('.food-item')];
 function toast(s){const t=$('toast');t.textContent=s;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.hidden=true,2500)}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
 function angleAt(a,b,c){
@@ -35,8 +35,10 @@ function classify(p){
  const thumbIndex=dist(p[4],p[8])/palm;
  const thumbRaised=p[4].y<p[0].y-palm*.22 && p[4].y<p[3].y-palm*.08;
  const otherCurled=!index&&!middle&&!ring&&!pink;
- // "괜찮아요": thumb and index touch, with the other three fingers extended.
- if(thumbIndex<.30&&middle&&ring&&pink)return 'pinch';
+ // OK gesture: allow perspective/landmark drift, but require the index to be curled
+ // and the other three fingers to remain extended.
+ const indexFolded=angleAt(p[5],p[6],p[8])<155 || dist(p[8],p[4])/palm<1.25;
+ if(thumbIndex<1.75&&indexFolded&&middle&&ring&&pink)return 'pinch';
  // "엄지 올리기": thumb is clearly above the wrist while the four fingers are curled.
  if(thumbRaised&&otherCurled&&dist(p[4],p[2])>palm*.45)return 'thumb';
  if(index&&middle&&ring&&!pink)return 'three';
@@ -97,21 +99,54 @@ function updatePhrase(g){
  document.querySelectorAll('.phrase-row').forEach(el=>el.classList.toggle('active',el.dataset.gesture===g));
  speakOnce(phrase);
 }
+function getMenu(){return [...document.querySelectorAll('.food-item')]}
 function choose(i){
- selected=(i+menu.length)%menu.length;confirmed=false;
+ menu=getMenu();if(!menu.length)return;
+ selected=Math.max(0,Math.min(i,menu.length-1));quantity=Math.max(1,quantity);confirmed=false;
  menu.forEach((b,j)=>b.classList.toggle('selected',j===selected));
- const b=menu[selected];$('kioskSelected').textContent=b.querySelector('.food-emoji').textContent+'　'+b.dataset.item;
- $('kioskPrice').textContent=b.dataset.price==='0'?'안내':Number(b.dataset.price).toLocaleString('ko-KR')+'원';
- $('kioskStatus').textContent='선택 '+b.dataset.number+'번: '+b.dataset.item+'. 엄지 올리기로 확인하세요.';
+ const b=menu[selected];
+ $('kioskSelected').textContent=b.querySelector('.food-emoji').textContent+'　'+b.dataset.item;
+ $('kioskPrice').textContent=Number(b.dataset.price).toLocaleString('ko-KR')+'원';
+ $('quantityValue').textContent=String(quantity);
+ $('kioskStatus').textContent='선택 '+b.dataset.number+'번: '+b.dataset.item+'. 수량을 정하고 장바구니에 담으세요.';
+}
+function changeQuantity(delta){
+ quantity=Math.max(1,Math.min(20,quantity+delta));
+ $('quantityValue').textContent=String(quantity);
+ const b=getMenu()[selected];if(b)$('kioskStatus').textContent=b.dataset.item+' '+quantity+'개를 선택했어요.';
+}
+function addToCart(){
+ menu=getMenu();const b=menu[selected];if(!b)return;
+ const key=b.dataset.item;
+ const found=cart.find(item=>item.name===key);
+ if(found)found.qty=Math.min(99,found.qty+quantity);
+ else cart.push({name:key,price:Number(b.dataset.price),emoji:b.querySelector('.food-emoji').textContent,qty:quantity});
+ renderCart();record('장바구니 추가: '+key+' × '+quantity,'장바구니');
+ $('kioskStatus').textContent=key+' '+quantity+'개를 장바구니에 담았어요.';
+ toast('장바구니에 추가했어요.');
+}
+function renderCart(){
+ const root=$('cartItems');
+ if(!cart.length){root.innerHTML='<p class="cart-empty">아직 담은 메뉴가 없어요. 메뉴를 선택하고 추가해 주세요.</p>';}
+ else root.innerHTML=cart.map((item,i)=>'<div class="cart-row"><div class="cart-item-main"><span>'+escapeHtml(item.emoji)+'</span><div><b>'+escapeHtml(item.name)+'</b><small>'+item.price.toLocaleString('ko-KR')+'원 · '+item.qty+'개</small></div></div><div class="cart-row-actions"><button type="button" data-cart-action="minus" data-cart-index="'+i+'" aria-label="'+escapeHtml(item.name)+' 수량 줄이기">−</button><b>'+item.qty+'</b><button type="button" data-cart-action="plus" data-cart-index="'+i+'" aria-label="'+escapeHtml(item.name)+' 수량 늘리기">+</button><button type="button" class="cart-remove" data-cart-action="remove" data-cart-index="'+i+'">삭제</button></div></div>').join('');
+ root.querySelectorAll('[data-cart-action]').forEach(btn=>btn.addEventListener('click',()=>{
+  const i=Number(btn.dataset.cartIndex),action=btn.dataset.cartAction;if(!cart[i])return;
+  if(action==='minus')cart[i].qty--;else if(action==='plus')cart[i].qty++;else cart.splice(i,1);
+  if(cart[i]&&cart[i].qty<1)cart.splice(i,1);
+  renderCart();
+ }));
+ const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
+ $('cartTotal').textContent=total.toLocaleString('ko-KR')+'원';
+ $('cartCount').textContent=cart.reduce((sum,item)=>sum+item.qty,0)+'개';
 }
 function confirmKiosk(){
- const b=menu[selected];
- if(b.dataset.item==='도움 요청'){$('kioskStatus').textContent='도움 안내: 직원에게 도움이 필요하다고 말해 주세요. 실제 호출은 되지 않습니다.';record('도움 안내 표시','데모');return}
- confirmed=true;$('kioskStatus').textContent=b.dataset.item+' 선택을 확인했어요. 실제 주문은 진행되지 않습니다.';
- record('선택 확인: '+b.dataset.item,'확인 완료');toast('선택을 확인했어요. 데모 화면입니다.');
+ if(!cart.length){addToCart();return}
+ const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
+ $('kioskStatus').textContent='주문 내역 확인: '+cart.map(item=>item.name+' '+item.qty+'개').join(', ')+'. 총 '+total.toLocaleString('ko-KR')+'원. 데모이므로 실제 주문은 진행되지 않습니다.';
+ record('주문 내역 확인 · '+total.toLocaleString('ko-KR')+'원','데모 확인');toast('주문 내역을 확인했어요. 실제 주문은 진행되지 않습니다.');
 }
-function cancelKiosk(){choose(0);$('kioskStatus').textContent='선택을 취소했어요. 1번 음료로 돌아왔어요.';record('키오스크 취소','취소 완료')}
-function helpKiosk(){$('kioskStatus').textContent='도움 안내: 1~4번은 손가락 개수, 엄지는 확인, 주먹은 취소예요. 실제 호출은 되지 않습니다.';record('도움말 표시','데모');toast('손동작 안내를 표시했어요.')}
+function cancelKiosk(){cart=[];quantity=1;choose(0);renderCart();$('kioskStatus').textContent='장바구니를 비웠어요.';record('장바구니 비우기','취소 완료')}
+function helpKiosk(){$('kioskStatus').textContent='도움말: 손가락 1~4개로 메뉴 선택, +/−로 수량 변경, 👌로 장바구니 추가, 👍로 주문 내역 확인을 할 수 있어요. 화면 버튼도 사용할 수 있습니다.';record('도움말 표시','데모');toast('손동작 안내를 표시했어요.')}
 function activate(g){
  if(mode==='communication'){updatePhrase(g);return}
  if(mode==='kiosk'){
@@ -119,7 +154,7 @@ function activate(g){
    if(g==='thumb'){confirmKiosk();return}
    if(g==='fist'){cancelKiosk();return}
    if(g==='open'){helpKiosk();return}
-   if(g==='pinch'){choose(selected===0?menu.length-1:selected-1);return}
+   if(g==='pinch'){addToCart();return}
    return;
  }
  if(mode==='research')toast('인식 기록에 추가했어요: '+gestures[g].label);
@@ -150,7 +185,7 @@ async function stopCamera(){
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
  mode=b.dataset.mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));document.querySelectorAll('.mode-content').forEach(p=>p.classList.toggle('active',p.id===mode+'Panel'));
- if(mode==='kiosk')$('recognitionHelp').textContent='1~4개 손가락은 메뉴, 엄지는 확인, 주먹은 취소, 손바닥은 도움말입니다.';
+ if(mode==='kiosk')$('recognitionHelp').textContent='손가락 1~4개로 메뉴 선택, 👌 장바구니 추가, 👍 주문 내역 확인, 주먹은 비우기입니다.';
  else if(mode==='communication')$('recognitionHelp').textContent='동작을 유지하면 문구가 표시됩니다.';
  else $('recognitionHelp').textContent='안정적으로 인식된 동작이 기록됩니다.';
 }));
@@ -158,6 +193,9 @@ $('startCamera').addEventListener('click',startCamera);$('stopCamera').addEventL
 $('speakOutput').addEventListener('click',()=>{if(currentPhrase){lastSpoken='';speakOnce(currentPhrase)}else toast('먼저 손동작을 인식해 주세요.')});
 $('kioskConfirm').addEventListener('click',confirmKiosk);$('kioskCancel').addEventListener('click',cancelKiosk);$('kioskHelp').addEventListener('click',helpKiosk);
 menu.forEach((b,i)=>b.addEventListener('click',()=>choose(i)));
+$('quantityMinus').addEventListener('click',()=>changeQuantity(-1));$('quantityPlus').addEventListener('click',()=>changeQuantity(1));
+$('addToCart').addEventListener('click',addToCart);
+$('addMenuForm').addEventListener('submit',e=>{e.preventDefault();const name=$('newMenuName').value.trim(),price=Math.max(0,Math.floor(Number($('newMenuPrice').value)));if(!name){toast('메뉴 이름을 입력해 주세요.');return}if(!Number.isFinite(price)||price>1000000){toast('가격을 확인해 주세요.');return}const list=$('foodList'),number=getMenu().length+1,button=document.createElement('button');button.type='button';button.className='food-item';button.dataset.item=name;button.dataset.price=String(price);button.dataset.number=String(number);button.innerHTML='<span class="food-number">'+String(number).padStart(2,'0')+'</span><span class="food-emoji">🍽️</span><span class="food-copy"><b></b><small>추가한 메뉴</small></span><strong></strong>';button.querySelector('.food-copy b').textContent=name;button.querySelector('strong').textContent=price.toLocaleString('ko-KR')+'원';list.appendChild(button);button.addEventListener('click',()=>choose(getMenu().indexOf(button)));menu=getMenu();$('newMenuName').value='';$('newMenuPrice').value='';choose(menu.length-1);toast('메뉴를 추가했어요.');record('사용자 메뉴 추가: '+name,'메뉴 추가')});
 $('autoSpeak').addEventListener('click',()=>{autoSpeak=!autoSpeak;$('autoSpeak').classList.toggle('on',autoSpeak);$('autoSpeak').setAttribute('aria-checked',String(autoSpeak));if(!autoSpeak&&'speechSynthesis'in window)speechSynthesis.cancel()});
 $('exportLog').addEventListener('click',()=>{
  if(!logs.length){toast('내보낼 기록이 없어요.');return}
