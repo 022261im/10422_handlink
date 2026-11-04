@@ -47,3 +47,6 @@
 @media(max-width:520px){.step-banner{align-items:flex-start;flex-direction:column}.step-banner small{text-align:left}.dialog{padding:22px 18px}}
 
 .phrase-text small{display:none}
+
+/* Separate Korean Sign Language input page link */
+.sign-tab{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
