@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b17"><title>HANDLINK — CO-OP GAME</title><link rel="stylesheet" href="coop.css"></head>
+<body><main class="wrap">
+<header class="top"><a class="brand" href="index.html"><span class="mark">H</span><span><b>HANDLINK</b><small>GESTURE ACCESS SYSTEM</small></span></a><a class="back" href="index.html">← HANDLINK 홈</a></header>
+<section class="hero"><p class="eyebrow">COOPERATIVE COMMUNICATION · 2 PLAYERS</p><h1>같은 공간, 다른 정보.<br><em>함께 해결하는 미션.</em></h1><p>각자의 화면에 다른 단서가 주어집니다. 손동작으로 정보를 전달하고, 두 사람이 협력해 연구 시설의 시스템을 복구하세요.</p></section>
+<section class="lobby card" id="lobby">
+<div class="section-head"><div><small>01 / ONLINE ROOM</small><h2>온라인 방 연결</h2></div><span class="status" id="netStatus">연결 전</span></div>
+<p class="desc">각자 다른 노트북에서 접속하세요. 한 명이 방을 만들고, 다른 한 명이 같은 방 코드로 참가합니다.</p>
+<div class="room-actions"><button class="primary" id="createRoom">방 만들기</button><div class="join"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 방 코드" aria-label="방 코드"><button class="secondary" id="joinRoom">참가하기</button></div></div>
+<div class="room-code" id="roomCodeBox" hidden><span>친구에게 이 코드를 알려주세요</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">코드 복사</button></div>
+<p class="fine">실시간 연결은 PeerJS 데이터 채널을 이용합니다. 카메라 영상은 전송하지 않으며, 인식된 문구와 게임 이벤트만 전달합니다.</p>
+</section>
+<section class="game" id="game" hidden>
+<div class="gamebar card"><div><small>MISSION 01 · FACILITY RESTORATION</small><h2 id="missionTitle">전력 제어실 복구</h2></div><div class="game-meta"><span id="roleLabel" class="role">역할 확인 중</span><span id="roundLabel">ROUND 1 / 3</span><button class="secondary small" id="leaveRoom">나가기</button></div></div>
+<div class="play-grid">
+<section class="world card"><div class="section-head"><div><small>02 / SHARED WORLD</small><h2>연구 시설</h2></div><span class="status online" id="partnerStatus">상대 연결 대기</span></div>
+<div class="scene" id="scene"><div class="room-label">POWER CONTROL · ZONE A</div><div class="machine"><div class="machine-light"></div><b>CORE</b><small>POWER SYSTEM</small></div><div class="avatar avatar-a" id="avatarA"><span class="bubble" id="bubbleA"></span><i>👩‍🔧</i><b>PLAYER A</b></div><div class="avatar avatar-b" id="avatarB"><span class="bubble" id="bubbleB"></span><i>🧑‍🔧</i><b>PLAYER B</b></div><div class="floor-line"></div><div class="scene-hint" id="sceneHint">두 플레이어가 연결되면 미션이 시작됩니다.</div></div>
+<div class="progress-line"><span id="progressText">미션 진행 0 / 3</span><div><i id="progressBar"></i></div></div>
+<div class="event-message" id="eventMessage" aria-live="polite">방을 만들거나 참가해 주세요.</div>
+</section>
+<section class="role-panel card"><div class="section-head"><div><small>03 / YOUR INFORMATION</small><h2>내 역할과 단서</h2></div></div>
+<div class="role-card" id="roleCard"><b>상대 플레이어를 기다리는 중</b><p>2명이 모두 접속하면 서로 다른 역할과 정보를 받습니다.</p></div>
+<div class="clue-panel" id="cluePanel" hidden><small>OBSERVER ONLY · 비밀 단서</small><h3>전력 복구 순서</h3><div class="code-clue" id="codeClue">2 → 1 → 3</div><p>이 순서를 상대에게 전달하세요. 상대 화면에는 정답이 표시되지 않습니다.</p></div>
+<div class="operator-panel" id="operatorPanel" hidden><small>OPERATOR ONLY · 조작 패널</small><h3>전력 스위치 입력</h3><p>상대가 전달한 단서를 듣고 올바른 순서대로 누르세요.</p><div class="digit-row"><span id="digit0">_</span><span id="digit1">_</span><span id="digit2">_</span></div><div class="keypad"><button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button id="undoDigit" class="secondary">⌫</button><button id="submitCode" class="primary wide">입력 확인</button></div></div>
+<div class="message-tools" id="messageTools" hidden><small>QUICK MESSAGE · 빠른 전달</small><div id="quickMessages"></div></div>
+</section>
+</div>
+<section class="communication card"><div class="section-head"><div><small>04 / GESTURE COMMUNICATION</small><h2>손동작으로 메시지 보내기</h2></div><span class="status" id="gestureStatus">카메라 꺼짐</span></div>
+<div class="comm-grid"><div class="local-camera"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder">카메라를 켜면 손동작을 인식합니다.</div><div class="cam-label" id="camLabel">LOCAL PROCESSING ONLY</div></div>
+<div class="gesture-side"><p>손동작은 이 기기에서 인식됩니다. 상대방에게는 결과 문구만 전달됩니다.</p><div class="gesture-map"><span>☝️ 왼쪽으로</span><span>✌️ 오른쪽으로</span><span>🖐️ 가운데로</span><span>👍 확인했어</span><span>✋ 잠깐 기다려</span><span>✊ 취소해</span><span>👌 다시 설명해 줘</span></div><div class="comm-buttons"><button class="primary" id="startGesture">카메라 시작</button><button class="secondary" id="stopGesture" disabled>카메라 종료</button></div></div></div>
+<div class="chat-log" id="chatLog"><span>메시지 기록은 여기에 표시됩니다.</span></div>
+</section>
+</section>
+<footer><span>HANDLINK CO-OP</span><span>2-PLAYER GESTURE COMMUNICATION</span></footer></main>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script><script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script><script src="coop.js"></script></body></html>
