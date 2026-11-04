@@ -15,3 +15,25 @@
 [hidden]{display:none!important}
 @media(max-width:900px){.shell{padding:0 12px}.lobby{grid-template-columns:1fr;gap:20px;padding:24px 0}.lobby-copy h1{font-size:42px}.game-hud{grid-template-columns:1fr auto}.hud-center{display:none}.center-board{width:40%;min-width:270px}.camera-inset{width:220px}.gesture-guide{width:220px}.gesture-item{padding:5px;gap:4px}.gesture-item strong{font-size:17px;width:22px;flex-basis:22px}.gesture-item b{font-size:8px}.gesture-item small{font-size:7px}}
 @media(max-height:700px){.camera-inset,.gesture-guide{bottom:8px;padding:8px}.camera-inset{width:245px}.gesture-guide{width:245px}.gesture-item{padding:5px}.gesture-item strong{font-size:17px}.camera-view{aspect-ratio:16/9}.center-board{top:48%;}.comms-overlay{top:8px}.scene-title{top:8px}}
+
+/* Receiver sees only the active cable-routing puzzle, never the sender's private clue. */
+body[data-role="receiver"] #cluePanel{display:none!important}
+body[data-role="receiver"] #operatorPanel{display:block!important}
+body[data-role="sender"] #operatorPanel{display:none!important}
+body[data-role="sender"] #cluePanel{display:block!important}
+.wire-status{font-size:10px;font-weight:900;color:#7165ce;background:#f2efff;border-radius:12px;padding:8px;margin:9px 0}
+.wire-tokens{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;min-height:48px;padding:6px}
+.wire-token{width:43px;height:43px;border:2px solid #ded8ff;border-radius:13px;background:linear-gradient(145deg,#fff4c9,#ffe7f1);font-size:23px;cursor:pointer;box-shadow:0 3px 0 #e1dcf5}
+.wire-token.selected{outline:3px solid #9b8cff;transform:translateY(-4px)}
+.wire-token.connected{opacity:.45;border-color:#8bdcb7;box-shadow:0 3px 0 #c7f0dc}
+.wire-ports{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}
+.wire-port{border:2px solid transparent;border-radius:12px;padding:10px 3px;font-size:10px;font-weight:900;cursor:pointer;color:#514d7e}
+.wire-port.sky{background:#e8f5ff;border-color:#bfe4ff}
+.wire-port.nature{background:#e9f9ed;border-color:#c5eccd}
+.wire-port.feeling{background:#fff0f5;border-color:#ffd0df}
+.wire-port:active{transform:scale(.97)}
+.wire-submit{width:100%;border:0;border-radius:12px;padding:11px;background:#8e7cf1;color:white;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #6759c8}
+.wire-submit:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+body[data-role="receiver"] .center-board{width:min(40%,520px)}
+body[data-role="receiver"] .board-content{padding:13px 17px}
+@media(max-width:700px){body[data-role="receiver"] .center-board{width:calc(100% - 24px);min-width:0}.wire-port{font-size:9px}}
