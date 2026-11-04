@@ -2,82 +2,79 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10130f"><title>HANDLINK — CO-OP FACILITY</title>
+<meta name="theme-color" content="#f7f7ff"><title>HANDLINK — EMOTE CO-OP</title>
 <link rel="stylesheet" href="coop.css">
 </head>
 <body>
 <main class="shell">
 <header class="topbar">
-  <a class="brand" href="index.html"><span class="brand-mark">H</span><span><b>HANDLINK</b><small>CO-OP FACILITY</small></span></a>
+  <a class="brand" href="index.html"><span class="brand-mark">H</span><span><b>HANDLINK</b><small>EMOTE CO-OP</small></span></a>
   <div class="top-center"><i id="connectionDot"></i><span id="netStatus">OFFLINE · 방에 연결하세요</span></div>
   <a class="home-link" href="index.html">나가기 ↗</a>
 </header>
-
 <section class="lobby" id="lobby">
-  <div class="lobby-copy"><span class="eyebrow">TWO PLAYER CO-OP / MISSION 01</span>
-    <h1>시설의 전력을<br><em>다시 연결하세요.</em></h1>
-    <p>한 명은 설계도를 보고, 한 명은 어두운 시설을 직접 탐색합니다. 서로 다른 정보를 손짓으로 전달해 세 개의 전력 장치를 복구하세요.</p>
-    <div class="lobby-features"><span>01 · 서로 다른 단서</span><span>02 · 실시간 제스처 통신</span><span>03 · 함께 푸는 장치 퍼즐</span></div>
+  <div class="lobby-copy"><span class="eyebrow">2 PLAYERS · 1 SHARED SCREEN</span>
+    <h1>손짓만으로<br><em>서로를 이해해 봐.</em></h1>
+    <p>두 플레이어가 서로 마주 보고 앉아 손동작으로 숫자와 간단한 표현을 전달합니다. 한 명은 제시된 정보를 몸짓으로 보내고, 다른 한 명은 그 의미를 맞혀요.</p>
+    <div class="lobby-features"><span>① 숫자 전달</span><span>② 이모트 표현</span><span>③ 짧은 협동 퀴즈</span></div>
   </div>
-  <div class="lobby-box"><small>PRIVATE CO-OP SESSION</small><h2>작전실 입장</h2>
-    <button class="primary" id="createRoom" type="button" onclick="if(window.handlinkCreateRoom){window.handlinkCreateRoom()}else{document.getElementById('lobbyNotice').textContent='게임 스크립트가 아직 로드되지 않았습니다. 페이지를 새로고침해 주세요.'}">새로운 방 만들기</button>
+  <div class="lobby-box"><small>PRIVATE ROOM</small><h2>친구와 함께 시작하기</h2>
+    <button class="primary" id="createRoom" type="button" onclick="if(window.handlinkCreateRoom){window.handlinkCreateRoom()}else{document.getElementById('lobbyNotice').textContent='게임 스크립트가 로드되지 않았습니다.'}">방 만들기</button>
     <div class="join-row"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 코드"><button class="secondary" id="joinRoom">참가</button></div>
-    <div class="room-code" id="roomCodeBox" hidden><span>친구에게 전달할 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div>
-    <p id="lobbyNotice" class="lobby-notice" aria-live="polite"></p><p>두 플레이어는 각자 카메라를 실행합니다. 카메라 영상은 상대에게 전송되지 않고 인식된 문장만 전달됩니다.</p>
+    <div class="room-code" id="roomCodeBox" hidden><span>친구에게 보낼 방 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div>
+    <p id="lobbyNotice" class="lobby-notice" aria-live="polite"></p>
+    <p>각자의 카메라 영상은 공유되지 않아요. 손동작을 인식한 결과만 상대에게 전달됩니다.</p>
   </div>
 </section>
-
 <section class="game" id="game" hidden>
   <div class="game-hud">
-    <div class="mission-id"><span class="eyebrow">FACILITY 01 / POWER RESTORATION</span><b id="missionTitle">전력 공급망 복구</b></div>
-    <div class="hud-center"><span class="role-pill" id="roleLabel">역할 대기</span><span id="roundLabel">SECTOR 01 / 03</span><div class="progress-track"><i id="progressBar"></i></div></div>
+    <div class="mission-id"><span class="eyebrow">HANDLINK · EMOTE ROOM</span><b id="missionTitle">손짓 전달 미션</b></div>
+    <div class="hud-center"><span class="role-pill" id="roleLabel">역할 대기</span><span id="roundLabel">ROUND 01 / 05</span><div class="progress-track"><i id="progressBar"></i></div></div>
     <div class="hud-right"><span class="partner-state" id="partnerStatus">상대 연결 확인 중</span><button id="leaveRoom" class="exit-btn">나가기</button></div>
   </div>
-
-  <section class="world" id="mapStage" aria-label="3D 협동 게임 공간"><div id="threeStage" class="three-stage"></div>
-    <div class="world-sky"></div><div class="back-wall"></div><div class="wall-light"></div>
-    <div class="wall-sign sign-left">POWER CONTROL <b>BLOCK / A</b></div>
-    <div class="wall-sign sign-right">EMERGENCY GRID <b>01 — 03</b></div>
-    <div class="pipe pipe-one"></div><div class="pipe pipe-two"></div>
-    <div class="floor"></div><div class="floor-grid"></div>
-    <div class="machine machine-left"><span>GENERATOR</span><b>G-01</b><i></i></div>
-    <div class="machine machine-right"><span>COOLING</span><b>C-02</b><i></i></div>
-    <div class="cable cable-a"></div><div class="cable cable-b"></div><div class="cable cable-c"></div>
-
-    <div class="terminal terminal-a" id="terminalA" data-node="A"><span class="terminal-light"></span><small>POWER RELAY</small><b>A</b><em>01</em></div>
-    <div class="terminal terminal-b" id="terminalB" data-node="B"><span class="terminal-light"></span><small>POWER RELAY</small><b>B</b><em>02</em></div>
-    <div class="terminal terminal-c" id="terminalC" data-node="C"><span class="terminal-light"></span><small>POWER RELAY</small><b>C</b><em>03</em></div>
-
-    <div class="player player-operator" id="playerToken"><div class="speech-bubble" id="mapToast" hidden></div><span class="player-name">YOU</span><div class="avatar"><i></i><b>●</b></div><span class="player-shadow"></span></div>
-    <div class="world-prompt" id="interactPrompt" hidden>장치에 접근했습니다 <kbd>E</kbd> 작동</div>
-    <div class="world-objective"><small>OBJECTIVE</small><b id="objectiveText">상대 플레이어가 접속하면 임무가 시작됩니다.</b></div>
-    <div class="world-coords">SECTOR A-01 <span>LIVE FACILITY</span></div>
-
-    <div class="blueprint" id="cluePanel" hidden>
-      <div class="blueprint-head"><span>FIELD BLUEPRINT</span><b>PLAYER A ONLY</b></div>
-      <strong id="clueTitle">전력 복구 순서</strong><p id="clueDescription">현장 조작자에게 순서를 전달하세요.</p>
-      <div class="blueprint-sequence" id="codeClue"><span>B</span><i>→</i><span>A</span><i>→</i><span>C</span></div>
-      <div class="blueprint-foot">이 설계도는 관찰자에게만 보입니다.</div>
+  <section class="world" id="mapStage" aria-label="서로 마주 보는 3D 게임 공간">
+    <div id="threeStage" class="three-stage"></div>
+    <div class="scene-title"><span>FACE TO FACE</span><b>말 대신 손짓으로 전달하세요</b></div>
+    <div class="player-tag sender-tag"><small>PLAYER 01</small><b>전달자</b><span id="senderBubble">준비 중…</span></div>
+    <div class="player-tag receiver-tag"><small>PLAYER 02</small><b>해석자</b><span id="receiverBubble">메시지를 기다리는 중</span></div>
+    <div class="center-board">
+      <div class="board-top"><span>MISSION <b id="roundNumber">01</b></span><span id="boardState">WAITING</span></div>
+      <div class="board-content">
+        <div class="sender-task" id="cluePanel"><small>전달자가 볼 정보</small><b id="clueTitle">숫자 3을 전달하세요</b><p id="clueDescription">카메라 앞에서 손가락으로 숫자를 표현하세요.</p><div class="target-symbol" id="codeClue">3</div></div>
+        <div class="receiver-task" id="operatorPanel" hidden><small>해석자가 볼 선택지</small><b>상대가 전달한 의미는?</b><p id="operatorInstruction">상대의 손동작을 보고 정답을 선택하세요.</p><div class="answer-grid" id="answerGrid"></div></div>
+      </div>
+      <div class="board-foot" id="objectiveText">상대 플레이어가 접속하면 게임이 시작됩니다.</div>
     </div>
-    <div class="operator-card" id="operatorPanel" hidden><small>FIELD OPERATOR</small><b>주변의 릴레이를 찾아 작동하세요.</b><span id="operatorInstruction">복구 순서는 상대의 손짓으로 확인하세요.</span></div>
-
     <div class="camera-inset">
-      <div class="camera-label"><span><i class="green-dot"></i> YOUR CAMERA</span><b id="gestureStatus">OFF</b></div>
-      <div class="camera-view"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder"><b>CAMERA OFF</b><small>손바닥을 카메라 정면으로 · 손가락 끝까지 화면 안에</small></div></div>
-      <div class="camera-controls"><button class="primary" id="startGesture">카메라 시작</button><button class="secondary" id="stopGesture" disabled>끄기</button></div>
+      <div class="camera-label"><span><i class="green-dot"></i> 내 카메라</span><b id="gestureStatus">OFF</b></div>
+      <div class="camera-view"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder"><b>손을 화면 안에 보여주세요</b><small>손바닥이 카메라를 향하고 손가락 끝이 모두 보여야 해요.</small></div></div>
+      <div class="camera-controls"><button class="primary" id="startGesture">카메라 켜기</button><button class="secondary" id="stopGesture" disabled>끄기</button></div>
+      <div class="gesture-live" id="gestureLive">인식된 손동작이 여기에 표시됩니다.</div>
     </div>
-
-    <div class="comms-overlay"><div class="comms-title"><span>TEAM COMMS</span><small>GESTURE TRANSLATION</small></div><div class="message-feed" id="chatLog"><span class="feed-empty">상대의 메시지를 기다리는 중…</span></div></div>
-    <aside class="gesture-guide" id="gestureGuide"><div class="gesture-guide-head"><b>GESTURE MANUAL</b><small>손 모양을 그대로 따라 하세요</small></div><div class="gesture-grid"><div class="gesture-item"><strong>☝️</strong><span><b>검지만 펴고 나머지 접기</b><small>왼쪽으로 이동</small></span></div><div class="gesture-item"><strong>✌️</strong><span><b>검지·중지만 펴고 나머지 접기</b><small>오른쪽으로 이동</small></span></div><div class="gesture-item"><strong>3️⃣</strong><span><b>검지·중지·약지 펴기</b><small>아래 장치 확인</small></span></div><div class="gesture-item"><strong>👍</strong><span><b>엄지만 위로 세우기</b><small>확인 / 승인</small></span></div><div class="gesture-item"><strong>🖐️</strong><span><b>다섯 손가락 모두 펴기</b><small>잠깐 대기</small></span></div><div class="gesture-item"><strong>✊</strong><span><b>다섯 손가락 접어 주먹</b><small>취소</small></span></div><div class="gesture-item"><strong>👌</strong><span><b>엄지·검지 끝 붙이고 나머지 펴기</b><small>다시 설명</small></span></div></div><div class="gesture-live" id="gestureLive">카메라를 켜면 인식된 제스처가 여기에 표시됩니다.</div></aside>
+    <aside class="gesture-guide" id="gestureGuide">
+      <div class="gesture-guide-head"><b>EMOTE GUIDE</b><small>손모양을 따라 해보세요</small></div>
+      <div class="gesture-grid">
+        <div class="gesture-item"><strong>✊</strong><span><b>주먹</b><small>0 · 없음 / 취소</small></span></div>
+        <div class="gesture-item"><strong>☝️</strong><span><b>검지 하나</b><small>1</small></span></div>
+        <div class="gesture-item"><strong>✌️</strong><span><b>검지와 중지</b><small>2</small></span></div>
+        <div class="gesture-item"><strong>🤟</strong><span><b>손가락 세 개</b><small>3</small></span></div>
+        <div class="gesture-item"><strong>🖖</strong><span><b>손가락 네 개</b><small>4</small></span></div>
+        <div class="gesture-item"><strong>🖐️</strong><span><b>손바닥 펼치기</b><small>5 · 안녕</small></span></div>
+        <div class="gesture-item"><strong>👍</strong><span><b>엄지 올리기</b><small>YES · 확인</small></span></div>
+        <div class="gesture-item"><strong>👌</strong><span><b>엄지와 검지 붙이기</b><small>OK</small></span></div>
+      </div>
+      <div class="guide-note">숫자는 손가락 개수로 전달돼요. 한 손만 카메라에 보여주세요.</div>
+    </aside>
+    <div class="comms-overlay"><div class="comms-title"><span>TEAM SIGNAL</span><small>최근 전달</small></div><div class="message-feed" id="chatLog"><span class="feed-empty">아직 전달된 신호가 없어요.</span></div></div>
     <div class="world-toast" id="worldToast" hidden></div>
   </section>
-  <footer class="game-footer"><span><b>W A S D</b> 이동 <i></i> <b>E</b> 장치 작동</span><span id="moveHint">관찰자의 제스처 안내를 확인하세요.</span><span>HANDLINK CO-OP PROTOCOL</span></footer>
+  <footer class="game-footer"><span>카메라 영상은 상대에게 공유되지 않습니다.</span><span id="moveHint">서로의 손짓과 선택에 집중하세요.</span><span>HANDLINK · COMMUNICATE WITHOUT WORDS</span></footer>
 </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
-<script src="coop3d.js?v=20261104-1"></script>
-<script src="coop.js?v=20261104-3" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다. GitHub Pages 배포 경로를 확인해야 합니다.'"></script>
+<script src="coop3d.js?v=20261105-1"></script>
+<script src="coop.js?v=20261105-1" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다.'"></script>
 </body></html>
