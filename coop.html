@@ -1,42 +1,81 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101713"><title>HANDLINK — FACILITY 01</title><link rel="stylesheet" href="coop.css"></head>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10130f"><title>HANDLINK — CO-OP FACILITY</title>
+<link rel="stylesheet" href="coop.css">
+</head>
 <body>
 <main class="shell">
-<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">H</span><span><b>HANDLINK</b><small>CO-OP OPERATIONS</small></span></a><div class="top-center"><i id="connectionDot"></i><span id="netStatus">OFFLINE · 방에 연결하세요</span></div><a class="home-link" href="index.html">나가기 ↗</a></header>
-<section class="lobby" id="lobby"><div class="lobby-copy"><span class="eyebrow">TWO PLAYER CO-OP · FACILITY 01</span><h1>정전된 연구 시설을<br><em>함께 복구하세요.</em></h1><p>한 명은 시설의 설계 정보를 보고, 다른 한 명은 현장을 직접 탐색합니다. 손동작으로 길과 단서를 전달하세요.</p></div><div class="lobby-box"><small>SECURE CONNECTION</small><h2>협동 세션 시작</h2><button class="primary" id="createRoom">새로운 방 만들기</button><div class="join-row"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 코드"><button class="secondary" id="joinRoom">참가</button></div><div class="room-code" id="roomCodeBox" hidden><span>친구에게 전달할 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div><p>각 기기에서 카메라를 개별 실행합니다. 영상은 공유되지 않습니다.</p></div></section>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="brand-mark">H</span><span><b>HANDLINK</b><small>CO-OP FACILITY</small></span></a>
+  <div class="top-center"><i id="connectionDot"></i><span id="netStatus">OFFLINE · 방에 연결하세요</span></div>
+  <a class="home-link" href="index.html">나가기 ↗</a>
+</header>
 
-<section class="game" id="game" hidden>
-<header class="mission-head"><div><span class="eyebrow">CHAPTER 01 / POWER RESTORATION</span><h1 id="missionTitle">전력 공급망 복구</h1></div><div class="mission-stats"><span class="role-pill" id="roleLabel">역할 대기</span><span id="roundLabel">PHASE 01 / 03</span><div class="progress-track"><i id="progressBar"></i></div><button id="leaveRoom" class="exit-btn">세션 종료</button></div></header>
-
-<div class="game-grid">
-<section class="play-area">
-<div class="play-toolbar"><span><i class="green-dot"></i> FACILITY FLOOR · A-01</span><span id="partnerStatus">상대 연결 확인 중</span></div>
-<div class="map-stage" id="mapStage">
-<div class="map-grid" id="mapGrid"></div>
-<div class="map-decor decor-a">GENERATOR<br><b>G-01</b></div><div class="map-decor decor-b">SERVICE<br><b>HALL</b></div>
-<div class="terminal terminal-a" id="terminalA"><b>A</b><small>NODE</small><i></i></div>
-<div class="terminal terminal-b" id="terminalB"><b>B</b><small>NODE</small><i></i></div>
-<div class="terminal terminal-c" id="terminalC"><b>C</b><small>NODE</small><i></i></div>
-<div class="player-token" id="playerToken"><span>YOU</span><b>♟</b></div>
-<div class="map-toast" id="mapToast">시설 연결을 기다리는 중…</div>
-<div class="interact-prompt" id="interactPrompt" hidden>가까이 왔어요 · <kbd>E</kbd> 장치 작동</div>
-<div class="map-coords">SECTOR A-01 <span>LIVE MAP</span></div>
-</div>
-<div class="play-footer"><div class="objective"><small>CURRENT OBJECTIVE</small><b id="objectiveText">상대 플레이어가 접속하면 임무가 시작됩니다.</b></div><div class="move-hint" id="moveHint">이동 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · 상호작용 <kbd>E</kbd></div><button class="interact-btn" id="interactBtn" disabled>장치 작동 <b>E</b></button></div>
+<section class="lobby" id="lobby">
+  <div class="lobby-copy"><span class="eyebrow">TWO PLAYER CO-OP / MISSION 01</span>
+    <h1>시설의 전력을<br><em>다시 연결하세요.</em></h1>
+    <p>한 명은 설계도를 보고, 한 명은 어두운 시설을 직접 탐색합니다. 서로 다른 정보를 손짓으로 전달해 세 개의 전력 장치를 복구하세요.</p>
+    <div class="lobby-features"><span>01 · 서로 다른 단서</span><span>02 · 실시간 제스처 통신</span><span>03 · 함께 푸는 장치 퍼즐</span></div>
+  </div>
+  <div class="lobby-box"><small>PRIVATE CO-OP SESSION</small><h2>작전실 입장</h2>
+    <button class="primary" id="createRoom">새로운 방 만들기</button>
+    <div class="join-row"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 코드"><button class="secondary" id="joinRoom">참가</button></div>
+    <div class="room-code" id="roomCodeBox" hidden><span>친구에게 전달할 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div>
+    <p>두 플레이어는 각자 카메라를 실행합니다. 카메라 영상은 상대에게 전송되지 않고 인식된 문장만 전달됩니다.</p>
+  </div>
 </section>
 
-<aside class="intel-panel">
-<div class="panel-head"><div><span class="eyebrow">YOUR ROLE / INTEL</span><h2>작전 정보</h2></div><span class="connection-tag" id="playerTag">PLAYER --</span></div>
-<div class="role-summary" id="roleCard"><b>두 번째 플레이어를 기다리는 중</b><p>연결되면 역할에 따라 다른 정보가 표시됩니다.</p></div>
-<div class="intel-content" id="cluePanel" hidden><div class="intel-title"><span>OBSERVER BLUEPRINT</span><b>기밀 정보</b></div><h3>복구 순서</h3><p>아래 순서대로 현장 장치를 작동하도록 손동작으로 안내하세요.</p><div class="sequence" id="codeClue"><span>B</span><i>→</i><span>A</span><i>→</i><span>C</span></div><div class="node-key"><span><i class="key-a"></i> NODE A · 동쪽</span><span><i class="key-b"></i> NODE B · 북쪽</span><span><i class="key-c"></i> NODE C · 남쪽</span></div><div class="intel-warning">이 정보는 관찰자에게만 표시됩니다.</div></div>
-<div class="intel-content operator-intel" id="operatorPanel" hidden><div class="intel-title"><span>FIELD OPERATOR</span><b>현장 단말</b></div><h3>장치를 찾아 복구하세요</h3><p>지도에서 장치에 접근한 뒤 E 키 또는 작동 버튼을 누르세요. 순서는 상대의 안내를 따라야 합니다.</p><div class="device-status" id="deviceStatus"><span>NODE A <b>대기 중</b></span><span>NODE B <b>대기 중</b></span><span>NODE C <b>대기 중</b></span></div><div class="operator-tip">이동: 방향키 또는 WASD<br>상호작용: E 키</div></div>
-<div class="mission-log"><div class="log-head"><b>MISSION LOG</b><span>LIVE</span></div><div id="missionLog"><p>시스템 대기 중.</p></div></div>
-</aside>
-</div>
+<section class="game" id="game" hidden>
+  <div class="game-hud">
+    <div class="mission-id"><span class="eyebrow">FACILITY 01 / POWER RESTORATION</span><b id="missionTitle">전력 공급망 복구</b></div>
+    <div class="hud-center"><span class="role-pill" id="roleLabel">역할 대기</span><span id="roundLabel">SECTOR 01 / 03</span><div class="progress-track"><i id="progressBar"></i></div></div>
+    <div class="hud-right"><span class="partner-state" id="partnerStatus">상대 연결 확인 중</span><button id="leaveRoom" class="exit-btn">나가기</button></div>
+  </div>
 
-<footer class="comms-dock">
-<div class="camera-box"><div class="dock-label"><span><i class="green-dot"></i> LOCAL CAMERA</span><small id="gestureStatus">OFF</small></div><div class="camera-view"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder">CAMERA<br><small>손을 화면 안에 보여주세요</small></div></div><div class="camera-buttons"><button class="primary" id="startGesture">카메라 시작</button><button class="secondary" id="stopGesture" disabled>끄기</button></div></div>
-<div class="comms-main"><div class="dock-label"><span>GESTURE COMMUNICATION</span><small>손동작은 이 기기에서 인식됩니다</small></div><div class="gesture-guide"><div><b>☝️</b><span>왼쪽</span></div><div><b>✌️</b><span>오른쪽</span></div><div><b>🖐️</b><span>가운데</span></div><div><b>👍</b><span>확인</span></div><div><b>✋</b><span>대기</span></div><div><b>✊</b><span>취소</span></div><div><b>👌</b><span>재설명</span></div></div><div class="message-feed" id="chatLog"><span class="feed-empty">통신 기록이 여기에 표시됩니다.</span></div></div>
-</footer>
-</section></main>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script><script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script><script src="coop.js"></script></body></html>
+  <section class="world" id="mapStage" aria-label="협동 게임 공간">
+    <div class="world-sky"></div><div class="back-wall"></div><div class="wall-light"></div>
+    <div class="wall-sign sign-left">POWER CONTROL <b>BLOCK / A</b></div>
+    <div class="wall-sign sign-right">EMERGENCY GRID <b>01 — 03</b></div>
+    <div class="pipe pipe-one"></div><div class="pipe pipe-two"></div>
+    <div class="floor"></div><div class="floor-grid"></div>
+    <div class="machine machine-left"><span>GENERATOR</span><b>G-01</b><i></i></div>
+    <div class="machine machine-right"><span>COOLING</span><b>C-02</b><i></i></div>
+    <div class="cable cable-a"></div><div class="cable cable-b"></div><div class="cable cable-c"></div>
+
+    <div class="terminal terminal-a" id="terminalA" data-node="A"><span class="terminal-light"></span><small>POWER RELAY</small><b>A</b><em>01</em></div>
+    <div class="terminal terminal-b" id="terminalB" data-node="B"><span class="terminal-light"></span><small>POWER RELAY</small><b>B</b><em>02</em></div>
+    <div class="terminal terminal-c" id="terminalC" data-node="C"><span class="terminal-light"></span><small>POWER RELAY</small><b>C</b><em>03</em></div>
+
+    <div class="player player-operator" id="playerToken"><div class="speech-bubble" id="mapToast" hidden></div><span class="player-name">YOU</span><div class="avatar"><i></i><b>●</b></div><span class="player-shadow"></span></div>
+    <div class="world-prompt" id="interactPrompt" hidden>장치에 접근했습니다 <kbd>E</kbd> 작동</div>
+    <div class="world-objective"><small>OBJECTIVE</small><b id="objectiveText">상대 플레이어가 접속하면 임무가 시작됩니다.</b></div>
+    <div class="world-coords">SECTOR A-01 <span>LIVE FACILITY</span></div>
+
+    <div class="blueprint" id="cluePanel" hidden>
+      <div class="blueprint-head"><span>FIELD BLUEPRINT</span><b>PLAYER A ONLY</b></div>
+      <strong>전력 복구 순서</strong><p>현장 조작자에게 순서를 전달하세요.</p>
+      <div class="blueprint-sequence" id="codeClue"><span>B</span><i>→</i><span>A</span><i>→</i><span>C</span></div>
+      <div class="blueprint-foot">이 설계도는 관찰자에게만 보입니다.</div>
+    </div>
+    <div class="operator-card" id="operatorPanel" hidden><small>FIELD OPERATOR</small><b>주변의 릴레이를 찾아 작동하세요.</b><span>복구 순서는 상대의 손짓으로 확인하세요.</span></div>
+
+    <div class="camera-inset">
+      <div class="camera-label"><span><i class="green-dot"></i> YOUR CAMERA</span><b id="gestureStatus">OFF</b></div>
+      <div class="camera-view"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder"><b>CAMERA OFF</b><small>손을 화면 안에 보여주세요</small></div></div>
+      <div class="camera-controls"><button class="primary" id="startGesture">카메라 시작</button><button class="secondary" id="stopGesture" disabled>끄기</button></div>
+    </div>
+
+    <div class="comms-overlay"><div class="comms-title"><span>TEAM COMMS</span><small>GESTURE TRANSLATION</small></div><div class="message-feed" id="chatLog"><span class="feed-empty">상대의 메시지를 기다리는 중…</span></div></div>
+    <div class="gesture-strip"><span>☝️ 이동 1</span><span>✌️ 이동 2</span><span>🖐️ 이동 3</span><span>👍 확인</span><span>✋ 대기</span><span>✊ 취소</span><span>👌 재설명</span></div>
+    <div class="world-toast" id="worldToast" hidden></div>
+  </section>
+  <footer class="game-footer"><span><b>W A S D</b> 이동 <i></i> <b>E</b> 장치 작동</span><span id="moveHint">관찰자의 제스처 안내를 확인하세요.</span><span>HANDLINK CO-OP PROTOCOL</span></footer>
+</section>
+</main>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
+<script src="coop.js"></script>
+</body></html>
