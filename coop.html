@@ -23,7 +23,7 @@
     <button class="primary" id="createRoom">새로운 방 만들기</button>
     <div class="join-row"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 코드"><button class="secondary" id="joinRoom">참가</button></div>
     <div class="room-code" id="roomCodeBox" hidden><span>친구에게 전달할 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div>
-    <p>두 플레이어는 각자 카메라를 실행합니다. 카메라 영상은 상대에게 전송되지 않고 인식된 문장만 전달됩니다.</p>
+    <p id="lobbyNotice" class="lobby-notice" aria-live="polite"></p><p>두 플레이어는 각자 카메라를 실행합니다. 카메라 영상은 상대에게 전송되지 않고 인식된 문장만 전달됩니다.</p>
   </div>
 </section>
 
@@ -74,7 +74,7 @@
   <footer class="game-footer"><span><b>W A S D</b> 이동 <i></i> <b>E</b> 장치 작동</span><span id="moveHint">관찰자의 제스처 안내를 확인하세요.</span><span>HANDLINK CO-OP PROTOCOL</span></footer>
 </section>
 </main>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
 <script src="coop.js"></script>
