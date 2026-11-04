@@ -34,7 +34,7 @@
     <div class="hud-right"><span class="partner-state" id="partnerStatus">상대 연결 확인 중</span><button id="leaveRoom" class="exit-btn">나가기</button></div>
   </div>
 
-  <section class="world" id="mapStage" aria-label="협동 게임 공간">
+  <section class="world" id="mapStage" aria-label="3D 협동 게임 공간"><div id="threeStage" class="three-stage"></div>
     <div class="world-sky"></div><div class="back-wall"></div><div class="wall-light"></div>
     <div class="wall-sign sign-left">POWER CONTROL <b>BLOCK / A</b></div>
     <div class="wall-sign sign-right">EMERGENCY GRID <b>01 — 03</b></div>
@@ -68,14 +68,15 @@
     </div>
 
     <div class="comms-overlay"><div class="comms-title"><span>TEAM COMMS</span><small>GESTURE TRANSLATION</small></div><div class="message-feed" id="chatLog"><span class="feed-empty">상대의 메시지를 기다리는 중…</span></div></div>
-    <div class="gesture-strip"><span>☝️ 이동 1</span><span>✌️ 이동 2</span><span>🖐️ 이동 3</span><span>👍 확인</span><span>✋ 대기</span><span>✊ 취소</span><span>👌 재설명</span></div>
+    <aside class="gesture-guide" id="gestureGuide"><div class="gesture-guide-head"><b>GESTURE MANUAL</b><small>손 모양을 그대로 따라 하세요</small></div><div class="gesture-grid"><div class="gesture-item"><strong>☝️</strong><span><b>검지만 펴기</b><small>왼쪽으로 이동</small></span></div><div class="gesture-item"><strong>✌️</strong><span><b>검지·중지 펴기</b><small>오른쪽으로 이동</small></span></div><div class="gesture-item"><strong>🤟</strong><span><b>손가락 3개 펴기</b><small>아래 장치 확인</small></span></div><div class="gesture-item"><strong>👍</strong><span><b>엄지 올리기</b><small>확인 / 승인</small></span></div><div class="gesture-item"><strong>🖐️</strong><span><b>손가락 모두 펴기</b><small>잠깐 대기</small></span></div><div class="gesture-item"><strong>✊</strong><span><b>주먹 쥐기</b><small>취소</small></span></div><div class="gesture-item"><strong>👌</strong><span><b>엄지와 검지 붙이기</b><small>다시 설명</small></span></div></div><div class="gesture-live" id="gestureLive">카메라를 켜면 인식된 제스처가 여기에 표시됩니다.</div></aside>
     <div class="world-toast" id="worldToast" hidden></div>
   </section>
   <footer class="game-footer"><span><b>W A S D</b> 이동 <i></i> <b>E</b> 장치 작동</span><span id="moveHint">관찰자의 제스처 안내를 확인하세요.</span><span>HANDLINK CO-OP PROTOCOL</span></footer>
 </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
-<script src="coop.js?v=20261104-2" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다. GitHub Pages 배포 경로를 확인해야 합니다.'"></script>
+<script src="coop.js?v=20261104-3" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다. GitHub Pages 배포 경로를 확인해야 합니다.'"></script>
 </body></html>
