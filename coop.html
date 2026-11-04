@@ -20,7 +20,7 @@
     <div class="lobby-features"><span>01 · 서로 다른 단서</span><span>02 · 실시간 제스처 통신</span><span>03 · 함께 푸는 장치 퍼즐</span></div>
   </div>
   <div class="lobby-box"><small>PRIVATE CO-OP SESSION</small><h2>작전실 입장</h2>
-    <button class="primary" id="createRoom">새로운 방 만들기</button>
+    <button class="primary" id="createRoom" type="button" onclick="if(window.handlinkCreateRoom){window.handlinkCreateRoom()}else{document.getElementById('lobbyNotice').textContent='게임 스크립트가 아직 로드되지 않았습니다. 페이지를 새로고침해 주세요.'}">새로운 방 만들기</button>
     <div class="join-row"><input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6자리 코드"><button class="secondary" id="joinRoom">참가</button></div>
     <div class="room-code" id="roomCodeBox" hidden><span>친구에게 전달할 코드</span><b id="roomCode">------</b><button class="secondary small" id="copyCode">복사</button></div>
     <p id="lobbyNotice" class="lobby-notice" aria-live="polite"></p><p>두 플레이어는 각자 카메라를 실행합니다. 카메라 영상은 상대에게 전송되지 않고 인식된 문장만 전달됩니다.</p>
@@ -77,5 +77,5 @@
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
-<script src="coop.js"></script>
+<script src="coop.js?v=20261104-2" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다. GitHub Pages 배포 경로를 확인해야 합니다.'"></script>
 </body></html>
