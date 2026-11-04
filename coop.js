@@ -12,7 +12,19 @@ function objective(t){$('objectiveText').textContent=t}
 function toast(t){$('worldToast').textContent=t;$('worldToast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('worldToast').hidden=true,2100)}
 function bubble(who,msg){addLog(who==='A'?'관찰자':'현장 조작자',msg);const el=$('mapToast');el.textContent=msg;el.hidden=false;clearTimeout(bubbleTimer);bubbleTimer=setTimeout(()=>el.hidden=true,3200)}
 function updateToken(px,py){$('playerToken').style.left=px+'%';$('playerToken').style.top=py+'%';window.Handlink3D?.player(px,py)}
-function updateRoundUI(){const phase=Math.min(round+1,3);$('roundLabel').textContent='SECTOR '+String(phase).padStart(2,'0')+' / 03';$('progressBar').style.width=(round/3*100)+'%';const clue=round===1?['A','C','B']:orders[Math.min(round,2)];let markup=round===1?'<span>A</span><i>↔</i><span>C</span><i>→</i><span>B</span>':clue.map(n=>'<span>'+n+'</span>').join('<i>→</i>');if(round===2)markup+='<i>+</i><span>👍</span>';$('codeClue').innerHTML=markup;const titles=['전력 경로 연결','병렬 회로 안정화','최종 안전 잠금'];const descriptions=['B → A → C 순서로 릴레이를 연결하세요.','A와 C를 먼저 연결하고, 마지막에 B를 연결하세요. A와 C의 순서는 자유입니다.','C → B → A 순서로 연결하세요. 각 릴레이를 작동한 뒤 관찰자가 👍로 승인해야 합니다.'];const operator=['상대가 알려주는 순서대로 릴레이에 접근해 E 키로 작동하세요.','A와 C를 원하는 순서로 연결한 뒤 B를 마지막에 연결하세요.','각 릴레이를 작동한 뒤 관찰자의 👍 확인 신호를 기다리세요.'];if(round<3){$('clueTitle').textContent=titles[round];$('clueDescription').textContent=descriptions[round];$('operatorInstruction').textContent=operator[round]}$('missionTitle').textContent=round>=3?'전력 공급망 복구 완료':'전력 공급망 복구'}
+function updateRoundUI(){
+ const phase=Math.min(round+1,3);
+ $('roundLabel').textContent='MODULE '+String(phase).padStart(2,'0')+' / 03';
+ $('progressBar').style.width=(round/3*100)+'%';
+ const clue=round===1?['A','C','B']:orders[Math.min(round,2)];
+ const markup=round===1?'<span>A</span><i>+</i><span>C</span><i>→</i><span>B</span>':clue.map(n=>'<span>'+n+'</span>').join('<i>→</i>');
+ $('codeClue').innerHTML=round===2?markup+'<i>+</i><span>👍</span>':markup;
+ const titles=['01 · 회로 순서 모듈','02 · 병렬 부하 모듈','03 · 안전 잠금 모듈'];
+ const descriptions=['현장 표시등의 순서를 확인하세요. B를 먼저, A를 두 번째, C를 마지막으로 연결해야 합니다.','A와 C를 모두 먼저 연결한 다음 B를 마지막으로 연결하세요. A와 C의 순서는 자유입니다.','C → B → A 순서로 연결하세요. 각 장치를 작동한 뒤 관찰자의 👍 승인을 받아야 다음 단계로 넘어갑니다.'];
+ const operator=['설계도에 표시된 순서를 전달받고 해당 릴레이에 접근해 E 키로 작동하세요.','A와 C를 먼저 작동하고, 마지막에 B를 작동하세요. 둘의 순서는 상관없습니다.','장치를 하나 작동할 때마다 멈추고 관찰자의 👍 승인을 기다리세요.'];
+ if(round<3){$('clueTitle').textContent=titles[round];$('clueDescription').textContent=descriptions[round];$('operatorInstruction').textContent=operator[round]}
+ $('missionTitle').textContent=round>=3?'시설 전력망 복구 완료':'시설 전력망 복구'
+}
 function renderState(){['A','B','C'].forEach(id=>{$term(id).classList.toggle('done',activated.includes(id));$term(id).classList.toggle('pending',pendingNode===id)});window.Handlink3D?.relays(activated,pendingNode);updateRoundUI();if(round>=3){$('progressBar').style.width='100%';objective('모든 전력 릴레이가 복구되었습니다. 팀 임무 성공!');$('interactPrompt').hidden=true;$('worldToast').textContent='POWER RESTORED · MISSION COMPLETE';$('worldToast').hidden=false;$('operatorPanel').innerHTML='<small>MISSION COMPLETE</small><b>시설의 전력이 복구되었습니다.</b><span>두 플레이어가 함께 임무를 완료했습니다.</span>';return}renderNear()}
 function setRole(r){role=r;$('gestureGuide').hidden=r!=='A';$('roleLabel').textContent=r==='A'?'A · 관찰자':'B · 현장 조작자';$('cluePanel').hidden=r!=='A';$('operatorPanel').hidden=r!=='B';$('moveHint').textContent=r==='A'?'설계도를 보고 손짓으로 방향을 알려주세요.':'상대의 손짓을 따라 이동하고 릴레이를 작동하세요.';$('playerToken').querySelector('.player-name').textContent=r==='A'?'OPERATOR':'YOU';$('objectiveText').textContent=r==='A'?'설계도를 확인하고 현장 조작자에게 순서를 전달하세요.':'릴레이를 찾아 이동하세요. 순서는 상대의 안내를 따라야 합니다.';updateRoundUI();renderState()}
 function beginGame(){if(gameReady)return;gameReady=true;$('lobby').hidden=true;$('game').hidden=false;window.Handlink3D?.init();$('partnerStatus').textContent='● 2명 연결됨';setRole(role);updateToken(x,y);$('worldToast').hidden=true;objective(role==='A'?'현장 조작자가 연결되었습니다. 설계도를 보고 손짓으로 안내하세요.':'시설에 진입했습니다. 관찰자의 지시를 기다리세요.');if(role==='A')send({type:'state',round,activated,pendingNode});else send({type:'ready',x,y})}
