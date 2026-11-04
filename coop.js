@@ -5,7 +5,7 @@ const symbols={zero:{emoji:'☁️',name:'구름'},one:{emoji:'⭐',name:'별'},
 const gestureText={zero:'주먹',one:'검지 하나',two:'브이',three:'손가락 세 개',four:'손가락 네 개',five:'손바닥',thumb:'엄지',pinch:'OK',wave:'손 흔들기'};
 const tasks=[
 {title:'PATTERN LAB · 패턴 추리',clue:'별과 달이 번갈아 나타납니다. 순서대로 손짓을 보내고, 다음에 올 기호를 맞혀보세요.',signals:['one','two','one','two'],question:'다음에 이어질 기호는?',choices:['⭐ 별','🌙 달','☁️ 구름','❤️ 하트'],answer:'⭐ 별'},
-{title:'ODD ONE OUT · 다른 하나 찾기',clue:'같은 종류가 세 번, 다른 종류가 한 번 나옵니다. 순서를 전달하고 다른 기호를 찾아보세요.',signals:['four','four','two','four'],question:'나머지 셋과 다른 기호는?',choices:['🍃 잎','🌙 달','🍃 잎','🍃 잎'],answer:'🌙 달'},
+{title:'ODD ONE OUT · 다른 하나 찾기',clue:'같은 종류가 세 번, 다른 종류가 한 번 나옵니다. 순서를 전달하고 다른 기호를 찾아보세요.',signals:['four','four','two','four'],question:'나머지 셋과 다른 기호는?',choices:['🍃 잎','🌙 달','☀️ 해','⭐ 별'],answer:'🌙 달'},
 {title:'MEMORY SEQUENCE · 순서 기억',clue:'아래 세 기호를 차례대로 전달하세요. 받은 순서와 같은 보기를 고르면 됩니다.',signals:['three','five','one'],question:'전달받은 순서와 일치하는 것은?',choices:['❤️ → ☀️ → ⭐','⭐ → ❤️ → ☀️','☀️ → ⭐ → ❤️','❤️ → ⭐ → ☀️'],answer:'❤️ → ☀️ → ⭐'},
 {title:'COMMON LINK · 공통점 찾기',clue:'세 기호의 순서를 전달하세요. 세 기호가 공통으로 속하는 범주를 찾아보세요.',signals:['zero','two','one'],question:'세 기호의 공통점은?',choices:['하늘에서 볼 수 있어요','먹을 수 있어요','감정을 나타내요','식물이에요'],answer:'하늘에서 볼 수 있어요'},
 {title:'NEXT IN LINE · 규칙 발견',clue:'해와 달이 반복되는 규칙입니다. 기호를 모두 전달하고 다음 순서를 추리하세요.',signals:['five','two','five','two','five'],question:'다음에 올 기호는?',choices:['☀️ 해','🌙 달','⭐ 별','🍃 잎'],answer:'🌙 달'}
