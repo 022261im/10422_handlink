@@ -48,5 +48,5 @@
 
 .phrase-text small{display:none}
 
-/* Separate Korean Sign Language input page link */
-.sign-tab{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+/* Separate two-player co-op game page link */
+.coop-tab{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
