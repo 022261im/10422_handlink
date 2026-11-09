@@ -41,10 +41,23 @@
       <div class="camera-controls"><button class="primary" id="startGesture">카메라 켜기</button><button class="secondary" id="stopGesture" disabled>끄기</button></div>
     </div>
 
-    <div class="speech-bubble" id="speechBubble" hidden><b id="speechSpeaker">상대</b><span id="speechText">좋아!</span></div>\n    <div class="partner-bubble" id="partnerBubble" hidden><span id="partnerBubbleText"></span></div>
+    <div class="speech-bubble" id="speechBubble" hidden><b id="speechSpeaker">상대</b><span id="speechText">좋아!</span></div>
+    <div class="partner-bubble" id="partnerBubble" hidden><span id="partnerBubbleText"></span></div>
     <div class="message-log" id="messageLog"></div>
-    <div class="role-console" id="roleConsole"></div>\n    <div class="interaction-hint" id="interactionHint">고정된 시점 · 손짓으로 숫자 전달</div>
+    <div class="role-console" id="roleConsole"></div>
+    <div class="interaction-hint" id="interactionHint">고정된 시점 · 손짓으로 숫자 전달</div>
     <div class="world-toast" id="worldToast" hidden></div>
+    <div class="result-screen" id="resultScreen" hidden>
+      <div class="result-card">
+        <div class="result-ribbon" id="resultTitle">STAGE CLEAR</div>
+        <div class="result-stars" id="resultStars"><span>★</span><span>★</span><span>★</span></div>
+        <div class="result-stat"><b>TIME</b><strong id="resultTime">00:00</strong></div>
+        <div class="result-stat"><b>MISTAKES</b><strong id="resultMistakes">0</strong></div>
+        <div class="result-stat"><b>SCORE</b><strong id="resultScore">1,000</strong></div>
+        <div class="result-votes" id="resultVotes">두 플레이어의 선택을 기다리는 중 · 0/2</div>
+        <div class="result-actions"><button id="retryStage">TRY AGAIN</button><button id="nextStage">NEXT LEVEL</button></div>
+      </div>
+    </div>
     <div class="gesture-controls"><span id="gestureLive">손짓 메시지 대기 중</span><span>1 · 2 · 3 · 👍 · 👎 · ✋</span></div>
   </section>
 </section>
