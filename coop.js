@@ -43,7 +43,7 @@ function setup(){conn.on('open',()=>{connected=true;status('ONLINE · CONNECTED'
  if(d.type==='switchAction'&&role==='A'){const step=fusePlan[sequenceIndex];if(!step||d.n!==step.n||d.state!==!!step.state){bubble('순서 또는 방향이 틀렸어요!');finish(false,'잘못된 스위치 조작');send({type:'stageResult',success:false});return}sequenceIndex++;send({type:'switchProgress',n:d.n,state:step.state,index:sequenceIndex});if(sequenceIndex===4){finish(true);send({type:'stageResult',success:true})}}
  if(d.type==='switchProgress'&&role==='B'){$('switchProgress').textContent='프로토콜 '+d.index+' / 4';if(d.index===4)finish(true)}
  if(d.type==='stageResult'){if(!d.success)finish(false,'상대가 잘못된 조작을 했습니다.');else if(!ended)finish(true)}
- if(d.type==='dollColor'&&role==='A'){dollColors[d.part]=d.color;window.Handlink3D?.setDollPart(d.part,d.color);const correct=targetDoll[d.part]===d.color;bubble(correct?'좋아!':'아니야!');send({type:'gesture',message:correct?'좋아!':'아니야!'})}
+ if(d.type==='dollColor'&&role==='A'){dollColors[d.part]=d.color;window.Handlink3D?.setDollPart(d.part,d.color);bubble(({hat:'모자',shirt:'상의',shoes:'신발'})[d.part]+' 색상 변경: '+colors[d.color])}
  if(d.type==='solved')toast('상대가 정답을 확인했어요!');if(d.type==='leave')toast('상대가 연결을 종료했어요.');
  });conn.on('close',()=>{connected=false;status('OFFLINE');$('partnerStatus').textContent='● 연결 끊김'});conn.on('error',()=>status('연결 오류'))}
 function transmit(g){if(!connected)return;const now=Date.now();if(now-lastSentAt<850)return;lastSentAt=now;const message=({one:'1',two:'2',three:'3',thumb:'👍',thumbDown:'👎',open:'잠깐만!',fist:'멈춰!',pinch:'OK',horns:'으;!'}[g]);if(!message)return;send({type:'gesture',message,gesture:g});$('gestureLive').textContent='전달함: '+message;if(stage===3&&role==='A'&&(g==='thumb'||g==='thumbDown'))bubble(message)}
