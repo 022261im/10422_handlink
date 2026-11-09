@@ -31,3 +31,23 @@
 .role-console .entered{font-family:monospace;letter-spacing:5px;font-size:18px;color:#ffd38e;min-height:22px}
 .role-console .small-note{font-size:8px;color:#bda98e}
 @media(max-width:760px){.role-console{right:8px;bottom:48px;min-width:195px;max-width:230px;padding:8px}.role-console .digit-tile{width:32px;height:32px}.partner-bubble{top:23%;font-size:12px}.camera-inset{width:92px}}
+
+/* Stage results inspired by arcade level-clear screens */
+.result-screen{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:#090806b8;backdrop-filter:blur(3px)}
+.result-card{position:relative;width:min(440px,90vw);padding:24px 26px 22px;background:#c8c4aa;border:9px solid #777365;border-radius:42px;color:#fff8e9;box-shadow:0 12px 0 #4a463d,0 22px 50px #0009;text-align:center}
+.result-ribbon{margin:-42px -4px 14px;padding:15px 8px;background:#d94d45;border:7px solid #ae2e27;border-radius:24px;color:white;font-size:27px;font-weight:1000;letter-spacing:1px;transform:rotate(-1deg);text-shadow:0 2px #9c302a}
+.result-stars{display:flex;justify-content:center;gap:15px;margin:7px 0 18px;color:#ffcf55;font-size:48px;text-shadow:0 3px #77603b}
+.result-stars .empty{color:#817e70;text-shadow:none}
+.result-stat{display:flex;justify-content:space-between;align-items:center;margin:8px 0;padding:11px 17px;background:#6d6a5d;border-radius:30px;color:white}
+.result-stat b{font-size:11px;letter-spacing:1px}.result-stat strong{font-size:23px;font-weight:1000}
+.result-votes{margin:13px 0 10px;color:#514d42;font-size:10px;font-weight:900}
+.result-actions{display:flex;justify-content:center;gap:10px}
+.result-actions button{border:6px solid #ad3028;border-radius:28px;background:#d94d45;color:white;padding:11px 17px;font-weight:1000;font-size:15px;cursor:pointer;box-shadow:0 4px 0 #8e2924}
+.result-actions button:disabled{opacity:.45;cursor:default}
+.result-actions button.selected{filter:brightness(.72);transform:translateY(3px);box-shadow:0 1px 0 #8e2924}
+.role-console{max-height:54%;overflow:auto}
+.role-console .part-row,.role-console .switch-row{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+.role-console .part-row button,.role-console .switch-row button{flex:1;min-width:30px}
+.role-console .switch-row button.on{background:#d69a36;color:#1d1711;border-color:#ffdb8b}
+.role-console .part-row button.chosen{outline:2px solid #ffdb8b;background:#9b6834}
+@media(max-width:760px){.result-card{padding:18px 15px 16px;border-width:7px}.result-ribbon{font-size:22px}.result-stat strong{font-size:19px}.result-actions button{font-size:12px;padding:9px 12px}.result-stars{font-size:40px}}
