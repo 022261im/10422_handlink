@@ -32,20 +32,20 @@
     <div class="hud-center"><span class="role-pill" id="roleLabel">역할 대기</span><span id="roundLabel">CIRCUIT 01 / 03</span></div>
     <div class="hud-right"><span class="partner-state" id="partnerStatus">상대 연결 확인 중</span><button id="leaveRoom" class="exit-btn">나가기</button></div>
   </div>
-  <section class="world" id="mapStage" aria-label="1인칭 전력 시설 게임 화면">
+  <section class="world" id="mapStage" aria-label="고정 시점 협동 퍼즐 게임 화면">
     <div id="threeStage" class="three-stage"></div>
-    <div class="crosshair" aria-hidden="true"></div>
+
     <div class="camera-inset" id="camera-inset">
       <div class="camera-label"><span><i class="green-dot"></i> 내 카메라</span><b id="gestureStatus">OFF</b></div>
       <div class="camera-view"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><div class="cam-placeholder" id="camPlaceholder"><b>손을 보여주세요</b></div></div>
       <div class="camera-controls"><button class="primary" id="startGesture">카메라 켜기</button><button class="secondary" id="stopGesture" disabled>끄기</button></div>
     </div>
-    <aside class="blueprint" id="blueprint" hidden><small>MAINTENANCE PLAN · 설계도</small><b>연결 순서</b><div id="blueprintLines">A → C<br>B → A<br>C → B</div><span>상대에게 손짓으로 방향을 알려주세요.</span></aside>
-    <div class="speech-bubble" id="speechBubble" hidden><b id="speechSpeaker">상대</b><span id="speechText">좋아!</span></div>
+
+    <div class="speech-bubble" id="speechBubble" hidden><b id="speechSpeaker">상대</b><span id="speechText">좋아!</span></div>\n    <div class="partner-bubble" id="partnerBubble" hidden><span id="partnerBubbleText"></span></div>
     <div class="message-log" id="messageLog"></div>
-    <div class="interaction-hint" id="interactionHint">WASD 이동 · 마우스로 시점 이동 · 클릭하여 단자 선택</div>
+    <div class="role-console" id="roleConsole"></div>\n    <div class="interaction-hint" id="interactionHint">고정된 시점 · 손짓으로 숫자 전달</div>
     <div class="world-toast" id="worldToast" hidden></div>
-    <div class="gesture-controls"><span id="gestureLive">손짓 메시지 대기 중</span><span>1·2·3 / 👍 / 👎 / ✋</span></div>
+    <div class="gesture-controls"><span id="gestureLive">손짓 메시지 대기 중</span><span>1 · 2 · 3 · 👍 · 👎 · ✋</span></div>
   </section>
 </section>
 </main>
@@ -53,6 +53,6 @@
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
-<script src="coop3d.js?v=20261109-fps1"></script>
-<script src="coop.js?v=20261109-fps1" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다.'"></script>
+<script src="coop3d.js?v=20261109-relay2"></script>
+<script src="coop.js?v=20261109-relay2" onerror="document.getElementById('lobbyNotice').textContent='coop.js 파일을 불러오지 못했습니다.'"></script>
 </body></html>
