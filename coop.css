@@ -11,7 +11,7 @@
 @media(max-height:650px){.topbar{height:48px;flex-basis:48px}.game{padding:3px 0}.game-hud{height:35px;flex-basis:35px}.camera-inset{width:105px}.blueprint{padding:8px}.blueprint div{font-size:13px}}
 
 /* Fixed tabletop co-op view */
-.world{background:#211812}.crosshair{display:none}.camera-inset{width:clamp(92px,9vw,122px);left:12px;top:12px}.camera-controls{display:none}.camera-view{aspect-ratio:4/3}.three-stage canvas{cursor:default}
+.world{background:#211812}.crosshair{display:none}.camera-inset{width:clamp(92px,9vw,122px);left:12px;top:12px}.camera-controls{display:flex}.camera-view{aspect-ratio:4/3}.three-stage canvas{cursor:default}
 .blueprint{display:none!important}.interaction-hint{bottom:14px}.gesture-controls{bottom:14px}
 .partner-bubble{position:absolute;z-index:12;left:50%;top:25%;transform:translate(-50%,-100%);padding:8px 13px;max-width:220px;background:#fff;border-radius:13px;color:#241c17;font-size:14px;font-weight:900;box-shadow:0 4px 18px #0008;pointer-events:none;white-space:nowrap}
 .partner-bubble:after{content:'';position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border-width:8px 7px 0;border-style:solid;border-color:#fff transparent transparent}
