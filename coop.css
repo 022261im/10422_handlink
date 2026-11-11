@@ -59,3 +59,39 @@
 
 /* World-space lever interaction */
 .three-stage canvas{cursor:crosshair;touch-action:none}.interaction-hint{max-width:min(90%,520px);text-align:center;white-space:normal}.role-console .protocol-list li{padding-left:2px}.role-console .protocol-list{line-height:2.15}
+
+/* Immersive first-person presentation: gameplay fills the viewport */
+body.playing{background:#087b9d}
+body.playing .shell{max-width:none;width:100%;height:100dvh;padding:0;background:#087b9d}
+body.playing .topbar{display:none}
+body.playing .game{position:fixed;inset:0;z-index:100;padding:0;gap:0}
+body.playing .game-hud{position:absolute;z-index:10;left:0;right:0;top:0;height:34px;min-height:34px;padding:5px 14px;pointer-events:none;color:#fff;text-shadow:0 2px 4px #000}
+body.playing .mission-id{display:none}
+body.playing .hud-center{position:absolute;left:50%;top:7px;transform:translateX(-50%);color:#fff}
+body.playing .role-pill{background:#17232dcc;border:1px solid #ffffff55;color:#fff}
+body.playing .hud-right{position:absolute;right:12px;top:5px;pointer-events:auto}
+body.playing .partner-state{color:#fff;font-weight:800}
+body.playing .exit-btn{background:#17232dcc;border:1px solid #ffffff66;color:#fff}
+body.playing .world{position:absolute;inset:0;border:0;background:#1686a2}
+body.playing .three-stage{position:absolute;inset:0}
+body.playing .camera-inset{left:12px;top:12px;width:clamp(84px,8vw,112px);padding:4px;background:#18232bc9;border:1px solid #ffffff80;border-radius:5px}
+body.playing .camera-label{font-size:7px}
+body.playing .camera-controls button{font-size:7px;padding:4px}
+body.playing .gesture-controls{left:14px;bottom:12px;padding:7px 9px;background:#17232bb8;border-radius:5px;gap:3px}
+body.playing .gesture-controls span:last-child{color:#fff}
+body.playing .message-log{right:14px;bottom:14px}
+body.playing .message-log div{background:#17232bd9;border:1px solid #ffffff55;border-radius:12px;padding:7px 11px;font-size:11px}
+body.playing .partner-bubble{z-index:14;background:#fff7df;color:#30231b;border:2px solid #744b2c;font-size:15px;padding:9px 15px;border-radius:18px}
+body.playing .partner-bubble:after{border-color:#fff7df transparent transparent}
+body.playing .speech-bubble{top:12%;background:#fff7df}
+body.playing .interaction-hint{bottom:14px;left:50%;background:#17232bd9;border:1px solid #ffffff55;border-radius:12px;padding:8px 12px;font-size:10px}
+body.playing .world-toast{top:72%;background:#17232beF;border:1px solid #fff8;border-radius:12px}
+body.playing .role-console{display:none!important}
+body.playing .result-screen{background:#101820b8}
+.world.stage-fuse .role-console{display:none!important}
+@media(max-width:760px){
+ body.playing .hud-center{top:36px}
+ body.playing .camera-inset{width:88px}
+ body.playing .interaction-hint{max-width:55%;font-size:8px}
+ body.playing .gesture-controls{max-width:48%;font-size:7px}
+}
