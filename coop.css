@@ -56,3 +56,6 @@
 .target-doll{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .target-doll span{padding:8px 9px;background:#443326;border:1px solid #9b7950;border-radius:5px;font-size:10px;font-weight:900;color:#fff0d8}
 .role-console button.action{margin-top:7px}
+
+/* World-space lever interaction */
+.three-stage canvas{cursor:crosshair;touch-action:none}.interaction-hint{max-width:min(90%,520px);text-align:center;white-space:normal}.role-console .protocol-list li{padding-left:2px}.role-console .protocol-list{line-height:2.15}
