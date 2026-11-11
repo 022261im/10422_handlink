@@ -86,7 +86,6 @@ body.playing .partner-bubble:after{border-color:#fff7df transparent transparent}
 body.playing .speech-bubble{top:12%;background:#fff7df}
 body.playing .interaction-hint{bottom:14px;left:50%;background:#17232bd9;border:1px solid #ffffff55;border-radius:12px;padding:8px 12px;font-size:10px}
 body.playing .world-toast{top:72%;background:#17232beF;border:1px solid #fff8;border-radius:12px}
-body.playing .role-console{display:none!important}
 body.playing .result-screen{background:#101820b8}
 .world.stage-fuse .role-console{display:none!important}
 @media(max-width:760px){
