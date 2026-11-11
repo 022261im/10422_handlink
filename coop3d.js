@@ -1,6 +1,6 @@
 (()=>{'use strict';
 let scene,renderer,camera,host,ready=false,avatarBubblePoint,bubbleActive=false;
-let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.18,yaw=0;
+let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.08,yaw=0;
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 function box(parent,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
