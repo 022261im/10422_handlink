@@ -35,8 +35,8 @@ function makePotato(){
  const mouth=new THREE.Mesh(new THREE.TorusGeometry(.105,.025,8,24,Math.PI),mouthMat);mouth.position.set(0,1.77,.59);mouth.rotation.z=Math.PI;g.add(mouth);
  // Short arms resting on the far edge of the desk, as if seated opposite the player
  for(const side of [-1,1]){
-  const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.55,5,12),potato);arm.position.set(side*.68,1.32,-.45);arm.rotation.z=side*.72;arm.rotation.x=-.25;g.add(arm);
-  const hand=ball(g,side*.88,1.23,-.78,.18,lightPotato);hand.scale.set(1,.65,1.1);g.add(hand);
+  const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.55,5,12),potato);arm.position.set(side*.68,1.32,.45);arm.rotation.z=side*.72;arm.rotation.x=-.25;g.add(arm);
+  const hand=ball(g,side*.88,1.23,.78,.18,lightPotato);hand.scale.set(1,.65,1.1);g.add(hand);
  }
  avatarBubblePoint=new THREE.Vector3(0,3.55,-6.55);
 }
