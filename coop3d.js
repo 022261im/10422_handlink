@@ -74,7 +74,7 @@ function makeManual(){
  c.fillStyle='#6b665b';c.font='22px sans-serif';c.fillText('상대가 조작을 마칠 때마다 상태를 확인하세요.',65,660);
  const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
  const picture=new THREE.Mesh(new THREE.PlaneGeometry(3.78,2.39),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));picture.position.set(0,.058,0);picture.rotation.x=-Math.PI/2;g.add(picture);
- protocolObjects.push(g);
+ manualGroup=g;
 }
 function makeSwitchPanel(){
  const g=new THREE.Group();scene.add(g);g.position.set(0,1.205,-2.55);
@@ -97,7 +97,7 @@ function makeSwitchPanel(){
  }
  // Decorative colored cables make the control device read as a real machine
  for(let i=0;i<4;i++){const cable=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,8,28,Math.PI),[red,blue,yellow,green][i]);cable.rotation.x=Math.PI/2;cable.position.set(-1.5+i*.55,.2,-.86);g.add(cable)}
- protocolObjects.push(g);
+ switchPanelGroup=g;
 }
 function makeDoll(){
  const skin=mat('#e8bd91'),red=mat('#e95b4a'),blue=mat('#398dc2'),yellow=mat('#efc34b');
