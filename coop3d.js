@@ -27,12 +27,12 @@ function makePotato(){
  for(let i=0;i<13;i++){const a=i*Math.PI*2/13;const rib=box(g,Math.cos(a)*.705,2.64,Math.sin(a)*.64,.025,.18,.035,beanieRib);rib.rotation.y=-a}
  // Sunglasses: two chunky dark lenses, bridge and temples
  for(const side of [-1,1]){
-  const lens=new THREE.Mesh(new THREE.SphereGeometry(.205,24,16),black);lens.position.set(side*.235,2.08,.535);lens.scale.set(1,.7,.22);g.add(lens);
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(.205,.035,8,28),frame);rim.position.set(side*.235,2.08,.56);rim.scale.set(1,.72,.35);g.add(rim);
+  const lens=new THREE.Mesh(new THREE.SphereGeometry(.205,24,16),black);lens.position.set(side*.235,2.08,.625);lens.scale.set(1,.7,.22);g.add(lens);
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(.205,.035,8,28),frame);rim.position.set(side*.235,2.08,.655);rim.scale.set(1,.72,.35);g.add(rim);
   const arm=box(g,side*.48,2.1,.32,.24,.055,.07,frame);arm.rotation.y=side*.24;
  }
- const bridge=box(g,0,2.1,.56,.13,.055,.06,frame);
- const mouth=new THREE.Mesh(new THREE.TorusGeometry(.105,.025,8,24,Math.PI),mouthMat);mouth.position.set(0,1.77,.59);mouth.rotation.z=Math.PI;g.add(mouth);
+ const bridge=box(g,0,2.1,.655,.13,.055,.06,frame);
+ const mouth=new THREE.Mesh(new THREE.TorusGeometry(.105,.025,8,24,Math.PI),mouthMat);mouth.position.set(0,1.77,.65);mouth.rotation.z=Math.PI;g.add(mouth);
  // Short arms resting on the far edge of the desk, as if seated opposite the player
  for(const side of [-1,1]){
   const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.55,5,12),potato);arm.position.set(side*.68,1.32,.45);arm.rotation.z=side*.72;arm.rotation.x=-.25;g.add(arm);
@@ -90,7 +90,7 @@ function makeSwitchPanel(){
   flatText(g,String(i+1),x,.228,z+.34,.36,.18,{bg:'#e9dfc8',fg:'#28221a',size:115});
   const pivot=new THREE.Group();pivot.position.set(x,.25,z);g.add(pivot);
   const stem=box(pivot,0,.27,0,.12,.53,.13,black);stem.rotation.z=-.18;
-  const cap=ball(pivot,0,.55,0,.145,colors[i]);pivot.add(cap);
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(.145,20,16),colors[i]);cap.position.set(0,.3,0);stem.add(cap);
   const hit=new THREE.Mesh(new THREE.BoxGeometry(.62,.72,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.set(0,.3,0);pivot.add(hit);hit.userData.switchNumber=i+1;
   switchMeshes.push({pivot,stem,hit,state:true});
   if(i===1){const lamp=ball(g,x,.31,z-.39,.105,yellow);lamp.material.emissive=new THREE.Color('#ffc52e');lamp.material.emissiveIntensity=2.4;g.add(lamp)}
