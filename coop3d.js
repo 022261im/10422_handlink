@@ -56,7 +56,7 @@ function makeProtocolBoard(){
  const title=label('SAFETY PROTOCOL',-1.65,1.228,-1.58,1.8,.22,'#f5e7c8','#593a22',43);
  const rows=['1  ·  노란 표시등 레버 내리기','2  ·  3번 레버 올리기','3  ·  5번 레버 내리기','4  ·  1번 레버 올리기'];
  const group=new THREE.Group();scene.add(group);group.position.set(-1.65,1.232,-2.15);
- rows.forEach((txt,i)=>{const o=label(txt,0,0,-i*.35,1.98,.25,'#fff1d5','#49301e',31,0);o.rotation.x=0;group.add(o)});
+ rows.forEach((txt,i)=>{const o=label(txt,0,0,-i*.35,1.98,.25,'#fff1d5','#49301e',31,-Math.PI/2);group.add(o)});
  protocolObjects.push(paper,title,group);
 }
 function makeDoll(){
@@ -93,7 +93,7 @@ function updateBubble(){
 }
 function onPointerMove(e){
  if(!ready)return;
- if(e.buttons===2){yaw=Math.max(-.32,Math.min(.32,yaw-e.movementX*.0025));pitch=Math.max(-.82,Math.min(.18,pitch-e.movementY*.003));camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch}
+ yaw=Math.max(-.32,Math.min(.32,yaw-e.movementX*.0025));pitch=Math.max(-.82,Math.min(.18,pitch-e.movementY*.003));camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch
 }
 function onClick(e){
  if(currentStage!==2||currentRole!=='B'||!ready)return;
