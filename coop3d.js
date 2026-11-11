@@ -19,6 +19,7 @@ function makeSwitchPanel(){
   const hit=new THREE.Mesh(new THREE.BoxGeometry(.48,.9,.45),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(0,.34,0);pivot.add(hit);hit.userData.switchNumber=i+1;
   switchMeshes.push({pivot,stem,hit,state:true});
   switchLabels.push(labelSprite(String(i+1),x,1.88,-3.48));
+  if(i===1){const lampMat=new THREE.MeshStandardMaterial({color:'#f2c44e',emissive:'#b87912',emissiveIntensity:1.8,roughness:.25});ball(scene,x,1.72,-3.42,.105,lampMat)}
  }
 }
 function makeDoll(){const skin=mat('#d7b18a'),red=mat('#d84b3f'),blue=mat('#397fc5'),yellow=mat('#e8bd42');dollMeshes.hat=new THREE.Mesh(new THREE.ConeGeometry(.33,.32,4),red);dollMeshes.hat.position.set(0,2.05,-3.65);scene.add(dollMeshes.hat);dollMeshes.shirt=new THREE.Mesh(new THREE.CylinderGeometry(.28,.34,.68,12),blue);dollMeshes.shirt.position.set(0,1.48,-3.65);scene.add(dollMeshes.shirt);dollMeshes.head=ball(scene,0,1.95,-3.65,.25,skin);dollMeshes.shoes=box(scene,0,1.05,-3.65,.65,.18,.34,yellow)}
