@@ -94,3 +94,12 @@ body.playing .result-screen{background:#101820b8}
  body.playing .interaction-hint{max-width:55%;font-size:8px}
  body.playing .gesture-controls{max-width:48%;font-size:7px}
 }
+
+/* Stage 02: the puzzle lives on the tabletop, not in the HTML console */
+.world.stage-fuse .role-console{display:none!important}
+body.playing .camera-inset{width:min(310px,27vw);left:16px;top:16px;padding:6px}
+body.playing .camera-label{font-size:9px}
+body.playing .camera-controls button{font-size:9px;padding:6px}
+body.playing .camera-view{aspect-ratio:4/3}
+body.playing .partner-bubble{z-index:16;min-width:74px;text-align:center;box-shadow:0 5px 16px #0008}
+@media(max-width:760px){body.playing .camera-inset{width:min(210px,38vw);left:8px;top:8px}}
