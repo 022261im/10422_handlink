@@ -1,6 +1,6 @@
 (()=>{'use strict';
 let scene,renderer,camera,host,ready=false,avatarBubblePoint;
-let switchMeshes=[],switchLabels=[],dollMeshes={},currentRole='B',currentStage=1,yaw=0,pitch=-.12;
+let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],currentRole='B',currentStage=1,yaw=0,pitch=-.12;
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 function box(parent,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
@@ -78,6 +78,7 @@ function makeHands(){
 function setRole(r){currentRole=r||'B';setStage(currentStage)}
 function setStage(n){
  currentStage=n;if(!ready)return;
+ protocolObjects.forEach(o=>o.visible=n===2&&currentRole==='A');
  switchMeshes.forEach(o=>{o.pivot.visible=n===2&&currentRole==='B';o.hit.visible=n===2&&currentRole==='B'});
  switchLabels.forEach(o=>o.visible=n===2&&currentRole==='B');
  Object.values(dollMeshes).forEach(o=>o.visible=n===3);
