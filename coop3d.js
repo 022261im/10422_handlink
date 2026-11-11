@@ -108,8 +108,9 @@ function makeDoll(){
 function setRole(r){currentRole=r||'B';setStage(currentStage)}
 function setStage(n){
  currentStage=n;if(!ready)return;
- protocolObjects.forEach(o=>o.visible=n===2&&currentRole==='A');
- const panel=scene.getObjectByName('fuseDeskPanel');if(panel)panel.visible=n===2&&currentRole==='B';
+ protocolObjects.forEach(o=>o.visible=false);
+ if(manualGroup)manualGroup.visible=n===2&&currentRole==='A';
+ if(switchPanelGroup)switchPanelGroup.visible=n===2&&currentRole==='B';
  switchMeshes.forEach(o=>{o.pivot.visible=n===2&&currentRole==='B';o.hit.visible=n===2&&currentRole==='B'});
  switchLabels.forEach(o=>o.visible=n===2&&currentRole==='B');
  Object.values(dollMeshes).forEach(o=>o.visible=n===3);
