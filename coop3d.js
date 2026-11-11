@@ -1,6 +1,6 @@
 (()=>{'use strict';
 let scene,renderer,camera,host,ready=false,avatarBubblePoint,bubbleActive=false;
-let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],currentRole='B',currentStage=1,pitch=-.18,yaw=0;
+let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.18,yaw=0;
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 function box(parent,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
@@ -20,7 +20,7 @@ function makePotato(){
  const potato=mat('#bd8247',.58),lightPotato=mat('#d49b5d',.62),black=mat('#15191c',.24,.1),frame=mat('#272b2e',.3,.25),beanie=mat('#252d39',.9),beanieRib=mat('#48515d',.8),mouthMat=mat('#57301f');
  const body=new THREE.Mesh(new THREE.SphereGeometry(1,48,36),potato);body.position.set(0,1.82,0);body.scale.set(.82,1.12,.62);g.add(body);
  // Soft potato dimples
- for(let i=0;i<13;i++){const a=i*2.399,b=-.72+(i%5)*.34;const x=Math.cos(a)*.69*Math.sqrt(1-b*b),z=Math.sin(a)*.49*Math.sqrt(1-b*b);const d=ball(g,x,1.82+b*.94,z+.05,.035,lightPotato);d.scale.set(1,.55,.45)}
+ for(let i=0;i<13;i++){const a=i*2.399,b=-.72+(i%5)*.34;const x=Math.cos(a)*.69*Math.sqrt(1-b*b),z=Math.sin(a)*.49*Math.sqrt(1-b*b);const d=ball(g,x,1.82+b*.94,z+.05,.035,lightPotato);d.scale.set(1,.55,.45);g.add(d)}
  // Beanie cap and folded cuff
  const cap=new THREE.Mesh(new THREE.SphereGeometry(.73,32,20,0,Math.PI*2,0,Math.PI*.58),beanie);cap.position.set(0,2.72,0);cap.scale.set(1,.58,.9);g.add(cap);
  const cuff=new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,.22,32),beanie);cuff.position.set(0,2.64,0);cuff.scale.z=.9;g.add(cuff);
@@ -36,7 +36,7 @@ function makePotato(){
  // Short arms resting on the far edge of the desk, as if seated opposite the player
  for(const side of [-1,1]){
   const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.55,5,12),potato);arm.position.set(side*.68,1.32,-.45);arm.rotation.z=side*.72;arm.rotation.x=-.25;g.add(arm);
-  const hand=ball(g,side*.88,1.23,-.78,.18,lightPotato);hand.scale.set(1,.65,1.1);
+  const hand=ball(g,side*.88,1.23,-.78,.18,lightPotato);hand.scale.set(1,.65,1.1);g.add(hand);
  }
  avatarBubblePoint=new THREE.Vector3(0,3.55,-6.55);
 }
@@ -93,7 +93,7 @@ function makeSwitchPanel(){
   const cap=ball(pivot,0,.55,0,.145,colors[i]);pivot.add(cap);
   const hit=new THREE.Mesh(new THREE.BoxGeometry(.62,.72,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.set(0,.3,0);pivot.add(hit);hit.userData.switchNumber=i+1;
   switchMeshes.push({pivot,stem,hit,state:true});
-  if(i===1){const lamp=ball(g,x,.31,z-.39,.105,yellow);lamp.material.emissive=new THREE.Color('#ffc52e');lamp.material.emissiveIntensity=2.4}
+  if(i===1){const lamp=ball(g,x,.31,z-.39,.105,yellow);lamp.material.emissive=new THREE.Color('#ffc52e');lamp.material.emissiveIntensity=2.4;g.add(lamp)}
  }
  // Decorative colored cables make the control device read as a real machine
  for(let i=0;i<4;i++){const cable=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,8,28,Math.PI),[red,blue,yellow,green][i]);cable.rotation.x=Math.PI/2;cable.position.set(-1.5+i*.55,.2,-.86);g.add(cable)}
@@ -142,7 +142,7 @@ function init(){
  makeRoom();makeManual();makeSwitchPanel();makeDoll();
  const panel=scene.children.find(o=>o.type==='Group'&&o.position.x===0&&o.position.z===-2.55&&o.children.length>10);if(panel)panel.name='fuseDeskPanel';
  // Hide puzzle objects until a stage and role are selected
- protocolObjects.forEach(o=>o.visible=false);scene.getObjectByName('fuseDeskPanel')&&(scene.getObjectByName('fuseDeskPanel').visible=false);
+ protocolObjects.forEach(o=>o.visible=false);if(manualGroup)manualGroup.visible=false;if(switchPanelGroup)switchPanelGroup.visible=false;
  const resize=()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()};
  new ResizeObserver(resize).observe(host);resize();ready=true;setStage(1);animate();
 }
