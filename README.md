@@ -1,21 +1,18 @@
-# HANDLINK
+# HANDLINK — CO-OP GAME
+
 **Hand Gesture Communication & Accessible Interface**
 
-HANDLINK is a browser-based prototype that connects a small set of hand gestures to communication phrases and a simulated accessible kiosk.
+HANDLINK is a two-player cooperative puzzle game controlled through webcam hand gestures.
 
-## Features
-- Webcam-based hand landmark recognition using MediaPipe Hands.
-- Five demo gestures: pointing, open palm, fist, V sign, and thumbs-up.
-- Temporal stabilization: a gesture must persist across multiple frames before it triggers an action.
-- Communication board with optional Korean text-to-speech.
-- Simulated kiosk navigation, confirmation, cancellation, and help screen.
-- Session event log and CSV export for exploratory performance testing.
+## Game
+- Two players join the same private room using a six-digit room code.
+- Each player's camera stays local; only recognized gesture messages are sent to the partner.
+- Players cooperate across three stages: number communication, lever sequence control, and bear-doll customization.
+- Puzzle targets and starting configurations are randomized for each new round.
+- A final results screen summarizes total play time, mistakes, and score.
 
 ## Run
-Open the GitHub Pages site over HTTPS and allow camera access. The first run needs an internet connection to load MediaPipe libraries from jsDelivr. A compatible webcam and modern browser are recommended.
-
-## Research notes
-Try changing one condition at a time: camera distance, lighting, or how long a gesture is held. Record known intended gestures separately and compare them with recognition events before calculating accuracy. Event timing alone is not a verified accuracy score.
+Open the GitHub Pages site over HTTPS, create a room on one device, and join with the six-digit code on the other device. Allow camera access to use gesture controls.
 
 ## Limitations
-This is a prototype, not a replacement for a full sign language system or professional augmentative and alternative communication device. The kiosk is a simulation only; no real orders, payments, or staff calls are sent. Camera frames are processed in the browser and are not uploaded by this application.
+This is a browser-based prototype. Network compatibility and gesture recognition can vary by browser, camera, and network environment.
