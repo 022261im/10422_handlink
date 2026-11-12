@@ -84,7 +84,7 @@ function create(){
 }
 function join(){
  if(peer)return;clearSignalRetry();signalRetryCount=0;peerOpenedOnce=false;joinAttempt=0;
- room=$('roomInput').value.replace(/\\D/g,'').slice(0,6);
+ room=$('roomInput').value.replace(/\D/g,'').slice(0,6);
  if(room.length!==6){status('6자리 방 코드를 입력하세요.');return}
  role='B';status('방 참가 중…');
  if(typeof Peer!=='function'){status('연결 모듈을 불러오지 못했습니다.');return}
@@ -93,7 +93,7 @@ function join(){
  peer.on('disconnected',()=>{if(!connected){status('신호 서버 연결이 끊겼어요 · 자동 재연결 중…');reconnectSignal()}});
  peer.on('error',onPeerError);
 }
-function setup(){if(connectionTimer)clearTimeout(connectionTimer);if(role==='B'){status('신호 서버 연결됨 · 방 주인과 연결 중…');connectionTimer=setTimeout(()=>{if(connected)return;status('연결 시간 초과 · 서로 다른 네트워크에서는 TURN 중계 서버가 필요할 수 있어요.');if(conn){try{conn.close()}catch{}conn=null}if(peer){try{peer.destroy()}catch{}peer=null}$('joinRoom').disabled=false},20000)}conn.on('open',()=>{if(connectionTimer){clearTimeout(connectionTimer);connectionTimer=null}connected=true;status('ONLINE · CONNECTED',true);startGame();if(role==='B')send({type:'ready'})});conn.on('data',d=>{if(!d)return;if(d.type==='ready'&&role==='A')startGame();if(d.type==='gesture'){bubble(d.message);if(/^[123]$/.test(d.message))receiveNumber(+d.message);if(d.message==='👍'&&stage===3&&role==='B')toast('상대가 좋아요!');if(d.message==='👎'&&stage===3&&role==='B')toast('상대가 아니라고 해요. 다시 조정하세요.')}
+function setup(){if(connectionTimer)clearTimeout(connectionTimer);status(role==='B'?'신호 서버 연결됨 · 방 주인과 연결 중…':'상대 접속 확인 · 데이터 연결 중…');connectionTimer=setTimeout(()=>{if(connected)return;status('데이터 연결 시간 초과 · 신호 서버와 기기 간 연결을 구분해 확인해야 해요.');if(conn){try{conn.close()}catch{}conn=null}if(peer){try{peer.destroy()}catch{}peer=null}$('joinRoom').disabled=false;$('createRoom').disabled=false},20000);conn.on('open',()=>{if(connectionTimer){clearTimeout(connectionTimer);connectionTimer=null}connected=true;status('ONLINE · CONNECTED',true);startGame();if(role==='B')send({type:'ready'})});conn.on('data',d=>{if(!d)return;if(d.type==='ready'&&role==='A')startGame();if(d.type==='gesture'){bubble(d.message);if(/^[123]$/.test(d.message))receiveNumber(+d.message);if(d.message==='👍'&&stage===3&&role==='B')toast('상대가 좋아요!');if(d.message==='👎'&&stage===3&&role==='B')toast('상대가 아니라고 해요. 다시 조정하세요.')}
  if(d.type==='vote'){votes[role==='A'?'B':'A']=d.action;$('resultVotes').textContent='상대 선택 도착 · 1/2';if(vote)applyVotes(vote,d.action)}
  if(d.type==='restart'&&d.stage===stage)resetRound();if(d.type==='stage')setStage(d.stage);
  if(d.type==='switchAction'&&role==='A'){window.Handlink3D?.setSwitch(d.n,d.state);const step=fusePlan[sequenceIndex];if(!step||d.n!==step.n||d.state!==step.state){toast('순서 또는 방향이 틀렸어요!');finish(false,'잘못된 레버 조작');send({type:'stageResult',success:false});return}sequenceIndex++;send({type:'switchProgress',n:d.n,state:step.state,index:sequenceIndex});if(sequenceIndex===4){finish(true);send({type:'stageResult',success:true})}}
