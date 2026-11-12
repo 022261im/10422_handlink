@@ -35,8 +35,64 @@ function updateEntered(){const el=$('answerEntered');if(el)el.textContent=[0,1,2
 function handleSwitch(n){if(role!=='B'||ended||stage!==2)return;const state=switchStates[n-1];switchStates[n-1]=!state;window.Handlink3D?.setSwitch(n,!state);send({type:'switchAction',n,state:!state});$('interactionHint').textContent=n+'번 레버 '+(!state?'ON':'OFF')+' · 다음 지시를 기다리세요.'}
 function receiveNumber(n){if(stage===3&&role==='B'){const part=chosenPart;dollColors[part]=n-1;window.Handlink3D?.setDollPart(part,n-1);$('dollStatus').textContent=({outfit:'원피스',headwear:'모자',accessory:'리본',shoes:'신발'})[part]+' 색상: '+colors[n-1]+' · 상대 확인 대기';send({type:'dollColor',part,color:n-1});return}if(stage===1&&role==='B'){if(incoming.length>=3)return;incoming.push(n);const tiles=$('receivedDigits')?.children;if(tiles&&tiles[incoming.length-1])tiles[incoming.length-1].textContent=n;if(incoming.length===3){const result=incoming.map(v=>decodeMap[v]);$('decodedText').textContent='해독 결과: '+result.join(' · ')+' — 상대에게 숫자를 전달하세요.';toast('신호 해독 완료')}}}
 function startGame(){if(!$('game').hidden)return;document.body.classList.add('playing');$('lobby').hidden=true;$('game').hidden=false;$('partnerStatus').textContent='● ONLINE';$('roleLabel').textContent=role==='A'?'전달자':'조작자';$('interactionHint').textContent='고정 시점 · 손짓 메시지로 협동';setStage(1);window.Handlink3D?.init(role);window.Handlink3D?.setRole(role);window.Handlink3D?.setStage(1)}
-function create(){if(peer)return;room=String(Math.floor(100000+Math.random()*900000));$('roomCode').textContent=room;$('roomCodeBox').hidden=false;role='A';status('방 생성 중…');if(typeof Peer!=='function'){status('연결 모듈을 불러오지 못했습니다.');return}peer=new Peer('handlink-fps-'+room);peer.on('open',()=>{status('방 생성 완료 · 친구 참가 대기 중',true);$('createRoom').disabled=true});peer.on('connection',c=>{if(conn){c.close();return}conn=c;setup()});peer.on('error',e=>{status('방 생성 실패: '+(e.type||e.message));peer?.destroy();peer=null;$('createRoom').disabled=false})}
-function join(){if(peer)return;room=$('roomInput').value.replace(/\D/g,'').slice(0,6);if(room.length!==6){status('6자리 방 코드를 입력하세요.');return}role='B';status('방 참가 중…');if(typeof Peer!=='function'){status('연결 모듈을 불러오지 못했습니다.');return}peer=new Peer();peer.on('open',()=>{status('신호 서버 연결됨 · 방 주인에게 연결 요청 중…');conn=peer.connect('handlink-fps-'+room,{reliable:true});setup()});peer.on('disconnected',()=>{if(!connected)status('신호 서버 연결이 끊겼어요. 네트워크를 확인해 주세요.')});peer.on('error',e=>{if(connectionTimer){clearTimeout(connectionTimer);connectionTimer=null}status('참가 실패: '+(e.type||e.message));peer?.destroy();peer=null;conn=null;$('joinRoom').disabled=false})}
+let signalRetryTimer=null,signalRetryCount=0,peerOpenedOnce=false,joinAttempt=0;
+function clearSignalRetry(){if(signalRetryTimer){clearTimeout(signalRetryTimer);signalRetryTimer=null}}
+function reconnectSignal(){
+ if(!peer||peer.destroyed||connected||signalRetryTimer)return;
+ if(signalRetryCount>=5){status('신호 서버 재연결 실패 · 페이지를 새로고침하고 다시 시도해 주세요.');return}
+ signalRetryCount++;
+ status('신호 서버 재연결 중… ('+signalRetryCount+'/5)');
+ signalRetryTimer=setTimeout(()=>{
+  signalRetryTimer=null;
+  if(!peer||peer.destroyed||connected)return;
+  try{if(peer.disconnected)peer.reconnect()}catch(e){status('신호 서버 재연결 오류: '+(e.message||e))}
+ },1200*signalRetryCount);
+}
+function onPeerOpen(){
+ clearSignalRetry();signalRetryCount=0;
+ if(role==='A'){status('방 생성 완료 · 친구 참가 대기 중',true);$('createRoom').disabled=true;return}
+ status('신호 서버 연결됨 · 방 주인에게 연결 요청 중…',true);
+ if(conn){try{conn.close()}catch{}conn=null}
+ conn=peer.connect('handlink-fps-'+room,{reliable:true});
+ setup();
+}
+function onPeerError(e){
+ const type=e?.type||'unknown';
+ if(type==='network'||type==='socket-error'||type==='socket-closed'){
+  status('신호 서버 연결 오류 ('+type+') · 자동 재연결을 시도합니다.');
+  reconnectSignal();return;
+ }
+ if(connectionTimer){clearTimeout(connectionTimer);connectionTimer=null}
+ status('참가 실패: '+type+' · '+(e?.message||''));
+ if(type==='peer-unavailable'&&role==='B'&&joinAttempt<3){
+  joinAttempt++;status('방 주인을 찾지 못했어요. 방이 열린 상태인지 확인하고 재시도합니다 ('+joinAttempt+'/3)');
+  if(conn){try{conn.close()}catch{}conn=null}
+  setTimeout(()=>{if(peer&&!peer.destroyed&&!connected){conn=peer.connect('handlink-fps-'+room,{reliable:true});setup()}},1800);
+  return;
+ }
+ peer?.destroy();peer=null;conn=null;$('joinRoom').disabled=false;$('createRoom').disabled=false;
+}
+function create(){
+ if(peer)return;clearSignalRetry();signalRetryCount=0;peerOpenedOnce=false;
+ room=String(Math.floor(100000+Math.random()*900000));$('roomCode').textContent=room;$('roomCodeBox').hidden=false;role='A';status('방 생성 중…');
+ if(typeof Peer!=='function'){status('연결 모듈을 불러오지 못했습니다.');return}
+ peer=new Peer('handlink-fps-'+room,{debug:1});
+ peer.on('open',()=>{peerOpenedOnce=true;onPeerOpen()});
+ peer.on('connection',c=>{if(conn&&conn.open){c.close();return}conn=c;setup()});
+ peer.on('disconnected',()=>{if(!connected){status('신호 서버 연결이 끊겼어요 · 자동 재연결 중…');reconnectSignal()}});
+ peer.on('error',onPeerError);
+}
+function join(){
+ if(peer)return;clearSignalRetry();signalRetryCount=0;peerOpenedOnce=false;joinAttempt=0;
+ room=$('roomInput').value.replace(/\\D/g,'').slice(0,6);
+ if(room.length!==6){status('6자리 방 코드를 입력하세요.');return}
+ role='B';status('방 참가 중…');
+ if(typeof Peer!=='function'){status('연결 모듈을 불러오지 못했습니다.');return}
+ peer=new Peer(undefined,{debug:1});
+ peer.on('open',()=>{peerOpenedOnce=true;onPeerOpen()});
+ peer.on('disconnected',()=>{if(!connected){status('신호 서버 연결이 끊겼어요 · 자동 재연결 중…');reconnectSignal()}});
+ peer.on('error',onPeerError);
+}
 function setup(){if(connectionTimer)clearTimeout(connectionTimer);if(role==='B'){status('신호 서버 연결됨 · 방 주인과 연결 중…');connectionTimer=setTimeout(()=>{if(connected)return;status('연결 시간 초과 · 서로 다른 네트워크에서는 TURN 중계 서버가 필요할 수 있어요.');if(conn){try{conn.close()}catch{}conn=null}if(peer){try{peer.destroy()}catch{}peer=null}$('joinRoom').disabled=false},20000)}conn.on('open',()=>{if(connectionTimer){clearTimeout(connectionTimer);connectionTimer=null}connected=true;status('ONLINE · CONNECTED',true);startGame();if(role==='B')send({type:'ready'})});conn.on('data',d=>{if(!d)return;if(d.type==='ready'&&role==='A')startGame();if(d.type==='gesture'){bubble(d.message);if(/^[123]$/.test(d.message))receiveNumber(+d.message);if(d.message==='👍'&&stage===3&&role==='B')toast('상대가 좋아요!');if(d.message==='👎'&&stage===3&&role==='B')toast('상대가 아니라고 해요. 다시 조정하세요.')}
  if(d.type==='vote'){votes[role==='A'?'B':'A']=d.action;$('resultVotes').textContent='상대 선택 도착 · 1/2';if(vote)applyVotes(vote,d.action)}
  if(d.type==='restart'&&d.stage===stage)resetRound();if(d.type==='stage')setStage(d.stage);
