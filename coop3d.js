@@ -88,7 +88,7 @@ function drawManual(plan){
  c.fillStyle='#f4edda';c.fillRect(0,0,1200,760);c.strokeStyle='#2855a2';c.lineWidth=12;c.strokeRect(18,18,1164,724);c.beginPath();c.moveTo(600,24);c.lineTo(600,736);c.stroke();
  c.fillStyle='#244b91';c.font='bold 44px sans-serif';c.fillText('STAGE 02 · SAFETY PROTOCOL',65,90);
  c.fillStyle='#1e2e4a';c.font='bold 34px sans-serif';c.fillText('스위치 조작 순서',65,160);
- const lines=(plan||[]).map((x,i)=>(i+1)+'. '+(x.label||x.n+'번 레버')+' '+(x.state?'올리기':'내리기'));
+ const lines=(plan||[]).map((x,i)=>(i+1)+'. '+(x.label||x.n+'번 레버 '+(x.state?'올리기':'내리기')));
  c.font='bold 27px sans-serif';lines.forEach((t,i)=>{c.fillStyle='#23334f';c.fillText(t,70,250+i*90)});
  c.fillStyle='#244b91';c.font='bold 34px sans-serif';c.fillText('레버 위치 안내',655,160);
  for(let i=0;i<5;i++){const x=720+i*86;c.fillStyle=plan?.[0]?.n===i+1?'#efc340':'#d9d6cc';c.fillRect(x,225,58,105);c.strokeStyle='#263a5d';c.lineWidth=5;c.strokeRect(x,225,58,105);c.fillStyle='#1d2f4d';c.font='bold 30px sans-serif';c.fillText(String(i+1),x+20,285)}
