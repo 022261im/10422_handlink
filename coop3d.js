@@ -1,6 +1,6 @@
 (()=>{'use strict';
 let scene,renderer,camera,host,ready=false,avatarBubblePoint,bubbleActive=false;
-let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.72,yaw=0;
+let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-1.12,yaw=0;
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 function box(parent,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
@@ -17,52 +17,44 @@ function flatText(parent,text,x,y,z,w,h,options={}){
 }
 function makePotato(){
  const g=new THREE.Group();scene.add(g);g.position.set(0,0,-6.35);
- const potatoMat=new THREE.MeshStandardMaterial({color:'#c99a59',roughness:1});
- const black=mat('#111820',.22,.04),lensMat=new THREE.MeshPhysicalMaterial({color:'#101820',roughness:.16,metalness:.12,clearcoat:1,clearcoatRoughness:.08}),frame=mat('#171d22',.3,.12),mouthMat=mat('#38251d');
- // Rounded, slightly lumpy potato mascot based on the supplied reference.
+ const potatoMat=new THREE.MeshStandardMaterial({color:'#c99b61',roughness:1});
+ const lensMat=new THREE.MeshPhysicalMaterial({color:'#080d12',roughness:.2,metalness:.08,clearcoat:1,clearcoatRoughness:.12});
+ const frame=mat('#17191b',.28,.08),mouthMat=mat('#38251d');
+ // A squat, rounded potato body matching the supplied soft 3D mascot reference.
  const geo=new THREE.SphereGeometry(1,64,48),pos=geo.attributes.position;
  for(let i=0;i<pos.count;i++){
   const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);
-  const lump=1+.025*Math.sin(x*5.5+z*2.4)*Math.cos(y*6.2-z*3.1)+.012*Math.sin(z*11+y*4);
+  const lump=1+.035*Math.sin(x*5+z*3)*Math.cos(y*5-z*2)+.018*Math.sin(z*10+y*4);
   pos.setXYZ(i,x*lump,y*lump,z*lump);
  }
  geo.computeVertexNormals();
- const body=new THREE.Mesh(geo,potatoMat);body.position.set(0,1.48,0);body.scale.set(.91,.98,.76);g.add(body);
- // Tiny, soft surface speckles keep the potato texture subtle.
- const speck=mat('#b9874e',1);
- for(let i=0;i<18;i++){
-  const a=i*2.399,yy=-.72+(i%7)*.21;
-  const rr=Math.sqrt(1-yy*yy),x=Math.cos(a)*.89*rr,z=Math.sin(a)*.73*rr;
-  const d=new THREE.Mesh(new THREE.SphereGeometry(.012+(i%3)*.003,8,6),speck);
-  d.position.set(x,1.48+yy*.96,z+.012);g.add(d);
- }
- // Four short rounded feet/arms, kept close to the body like the reference mascot.
+ const body=new THREE.Mesh(geo,potatoMat);body.position.set(0,1.22,0);body.scale.set(1.02,.86,.88);g.add(body);
+ // Four short, rounded nubs instead of long arms or legs.
  for(let i=0;i<4;i++){
   const side=i<2?-1:1,front=i%2===0?1:-1;
-  const limb=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.22,5,12),potatoMat);
-  limb.position.set(side*(i<2?.48:.48),.62,front*.31);
-  limb.rotation.z=side*.48;limb.rotation.x=front*.25;limb.scale.set(1,.9,1);g.add(limb);
+  const limb=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.17,6,14),potatoMat);
+  limb.position.set(side*.59,.55,front*.34);
+  limb.rotation.z=side*.62;limb.rotation.x=front*.32;
+  limb.scale.set(1,.9,1);g.add(limb);
  }
- // Black sunglasses only — no hat, eyebrows, or extra costume.
- const glasses=new THREE.Group();glasses.position.set(0,1.72,.705);g.add(glasses);
+ // Sunglasses only; no hat, beanie, eyebrows, or costume.
+ const glasses=new THREE.Group();glasses.position.set(0,1.43,.81);g.add(glasses);
  for(const side of [-1,1]){
-  const x=side*.235;
-  const lens=new THREE.Mesh(new THREE.BoxGeometry(.39,.235,.065),lensMat);
-  lens.position.set(x,0,.02);glasses.add(lens);
-  const rim=new THREE.Mesh(new THREE.BoxGeometry(.435,.28,.055),frame);
-  rim.position.set(x,0,-.012);glasses.add(rim);
-  const inner=new THREE.Mesh(new THREE.BoxGeometry(.375,.22,.025),lensMat);
-  inner.position.set(x,0,.035);glasses.add(inner);
-  const arm=box(glasses,side*.455,.005,-.12,.18,.045,.055,frame);arm.rotation.y=side*.22;
+  const x=side*.245;
+  const rim=new THREE.Mesh(new THREE.BoxGeometry(.43,.27,.065),frame);
+  rim.position.set(x,0,0);glasses.add(rim);
+  const lens=new THREE.Mesh(new THREE.BoxGeometry(.375,.215,.035),lensMat);
+  lens.position.set(x,0,.045);glasses.add(lens);
+  const arm=box(glasses,side*.45,0,-.13,.17,.045,.055,frame);arm.rotation.y=side*.2;
  }
- box(glasses,0,.005,.025,.12,.055,.06,frame);
- const glintMat=new THREE.MeshBasicMaterial({color:'#b7d9e8'});
+ box(glasses,0,0,.025,.13,.055,.07,frame);
+ const glintMat=new THREE.MeshBasicMaterial({color:'#a9cbdc'});
  for(const side of [-1,1]){
-  const glint=box(glasses,side*.235-.075,.065,.052,.035,.012,.008,glintMat);glint.rotation.z=-.3;
+  const glint=box(glasses,side*.245-.075,.065,.068,.035,.012,.008,glintMat);glint.rotation.z=-.3;
  }
  const smile=new THREE.Mesh(new THREE.TorusGeometry(.105,.018,8,28,Math.PI),mouthMat);
- smile.position.set(0,1.39,.738);smile.rotation.z=Math.PI;g.add(smile);
- avatarBubblePoint=new THREE.Vector3(0,2.65,-6.35);
+ smile.position.set(0,1.02,.875);smile.rotation.z=Math.PI;g.add(smile);
+ avatarBubblePoint=new THREE.Vector3(0,2.25,-6.35);
 }
 function makeRoom(){
  scene.background=new THREE.Color('#087f9e');scene.fog=new THREE.Fog('#087f9e',18,36);
@@ -151,7 +143,7 @@ function updateBubble(){
 function showPartnerBubble(active){bubbleActive=!!active}
 function onPointerMove(e){
  if(!ready)return;
- yaw=Math.max(-.32,Math.min(.32,yaw-e.movementX*.0025));pitch=Math.max(-.82,Math.min(.22,pitch-e.movementY*.003));camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
+ yaw=Math.max(-.32,Math.min(.32,yaw-e.movementX*.0025));pitch=Math.max(-1.42,Math.min(.35,pitch-e.movementY*.003));camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
 }
 function onClick(e){
  if(currentStage!==2||currentRole!=='B'||!ready)return;
@@ -161,7 +153,7 @@ function onClick(e){
 }
 function init(){
  if(ready)return;host=document.getElementById('threeStage');if(!host||!window.THREE)return;
- scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(66,1,.08,80);camera.position.set(0,2.65,1.0);camera.rotation.order='YXZ';camera.rotation.x=pitch;
+ scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(66,1,.08,80);camera.position.set(0,4.35,-.65);camera.rotation.order='YXZ';camera.rotation.x=pitch;
  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;host.appendChild(renderer.domElement);
  renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());renderer.domElement.addEventListener('pointermove',onPointerMove);renderer.domElement.addEventListener('click',onClick);
  makeRoom();makeManual();makeSwitchPanel();makeDoll();
