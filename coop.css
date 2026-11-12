@@ -125,3 +125,8 @@ body.playing .message-log div{font-size:10px;padding:6px 10px;border-radius:9px;
 .color-guide{display:flex;gap:6px;margin-top:8px}
 .color-guide span{flex:1;text-align:center;padding:6px 3px;background:#3b3026;border:1px solid #846846;border-radius:4px;font-size:9px;font-weight:800}
 @media(max-width:760px){body.playing .message-log{left:8px;top:clamp(210px,36vh,260px);max-width:42vw}.doll-reference{gap:6px;padding:6px}.reference-doll{flex-basis:60px;height:72px;font-size:31px}.reference-spec{font-size:8px}}
+
+.reference-spec-live{display:flex;flex-direction:column;gap:7px;padding:9px 10px;margin:10px 0;background:#443326;border:1px solid #9b7950;border-radius:5px}
+.reference-spec-live>b{font-size:10px;color:#ffdb9b}
+.reference-spec-live span{display:flex;align-items:center;gap:7px;font-size:10px;color:#fff0d8}
+.target-swatch{display:inline-block;width:17px;height:17px;flex:0 0 17px;border:1px solid #fff2d8;border-radius:4px;box-shadow:0 1px 4px #0008}
