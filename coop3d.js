@@ -37,21 +37,32 @@ function makePotato(){
   limb.rotation.z=side*.62;limb.rotation.x=front*.32;
   limb.scale.set(1,.9,1);g.add(limb);
  }
- // Sunglasses only; no hat, beanie, eyebrows, or costume.
+ // Soft dark beanie pulled low, ending just above the sunglasses.
+ const beanieMat=mat('#333a3a',.92),beanieRim=mat('#252b2c',.88);
+ const cap=new THREE.Mesh(new THREE.SphereGeometry(1,48,32,0,Math.PI*2,0,Math.PI/2),beanieMat);
+ cap.position.set(0,1.62,0);cap.scale.set(1.01,.78,.9);g.add(cap);
+ const cuff=new THREE.Mesh(new THREE.TorusGeometry(.88,.085,12,64),beanieRim);
+ cuff.position.set(0,1.63,0);cuff.scale.set(1.12,1,.99);g.add(cuff);
+ // Long, rounded rectangular sunglasses with a thick sculpted frame.
  const glasses=new THREE.Group();glasses.position.set(0,1.43,.81);g.add(glasses);
- for(const side of [-1,1]){
-  const x=side*.245;
-  const rim=new THREE.Mesh(new THREE.BoxGeometry(.43,.27,.065),frame);
-  rim.position.set(x,0,0);glasses.add(rim);
-  const lens=new THREE.Mesh(new THREE.BoxGeometry(.375,.215,.035),lensMat);
-  lens.position.set(x,0,.045);glasses.add(lens);
-  const arm=box(glasses,side*.45,0,-.13,.17,.045,.055,frame);arm.rotation.y=side*.2;
+ function roundedLens(parent,x){
+  const shape=new THREE.Shape(),w=.30,h=.145,r=.105;
+  shape.moveTo(-w+r,-h);shape.lineTo(w-r,-h);shape.quadraticCurveTo(w,-h,w,-h+r);
+  shape.lineTo(w,h-r);shape.quadraticCurveTo(w,h,w-r,h);shape.lineTo(-w+r,h);
+  shape.quadraticCurveTo(-w,h,-w,h-r);shape.lineTo(-w,-h+r);shape.quadraticCurveTo(-w,-h,-w+r,-h);
+  const rimGeo=new THREE.ExtrudeGeometry(shape,{depth:.075,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.025,bevelThickness:.018});
+  const rim=new THREE.Mesh(rimGeo,frame);rim.position.set(x,0,0);parent.add(rim);
+  const lensShape=new THREE.Shape(),lw=.27,lh=.115,lr=.085;
+  lensShape.moveTo(-lw+lr,-lh);lensShape.lineTo(lw-lr,-lh);lensShape.quadraticCurveTo(lw,-lh,lw,-lh+lr);
+  lensShape.lineTo(lw,lh-lr);lensShape.quadraticCurveTo(lw,lh,lw-lr,lh);lensShape.lineTo(-lw+lr,lh);
+  lensShape.quadraticCurveTo(-lw,lh,-lw,lh-lr);lensShape.lineTo(-lw,-lh+lr);lensShape.quadraticCurveTo(-lw,-lh,-lw+lr,-lh);
+  const lens=new THREE.Mesh(new THREE.ShapeGeometry(lensShape),lensMat);lens.position.set(x,0,.102);parent.add(lens);
+  const glint=box(parent,x-.11,.055,.108,.045,.012,.006,new THREE.MeshBasicMaterial({color:'#a9cbdc'}));glint.rotation.z=-.25;
  }
- box(glasses,0,0,.025,.13,.055,.07,frame);
- const glintMat=new THREE.MeshBasicMaterial({color:'#a9cbdc'});
- for(const side of [-1,1]){
-  const glint=box(glasses,side*.245-.075,.065,.068,.035,.012,.008,glintMat);glint.rotation.z=-.3;
- }
+ roundedLens(glasses,-.32);roundedLens(glasses,.32);
+ box(glasses,0,0,.075,.12,.055,.09,frame);
+ box(glasses,-.69,0,-.11,.19,.045,.055,frame);
+ box(glasses,.69,0,-.11,.19,.045,.055,frame);
  const smile=new THREE.Mesh(new THREE.TorusGeometry(.105,.018,8,28,Math.PI),mouthMat);
  smile.position.set(0,1.02,.875);smile.rotation.z=Math.PI;g.add(smile);
  avatarBubblePoint=new THREE.Vector3(0,2.25,-6.35);
@@ -116,11 +127,36 @@ function makeSwitchPanel(){
  switchPanelGroup=g;
 }
 function makeDoll(){
- const skin=mat('#e8bd91'),red=mat('#e95b4a'),blue=mat('#398dc2'),yellow=mat('#efc34b');
- dollMeshes.hat=new THREE.Mesh(new THREE.ConeGeometry(.33,.32,5),red);dollMeshes.hat.position.set(0,2.1,-3.5);scene.add(dollMeshes.hat);
- dollMeshes.shirt=new THREE.Mesh(new THREE.CylinderGeometry(.28,.34,.68,12),blue);dollMeshes.shirt.position.set(0,1.52,-3.5);scene.add(dollMeshes.shirt);
- dollMeshes.head=ball(scene,0,1.98,-3.5,.25,skin);scene.add(dollMeshes.head);dollMeshes.shoes=box(scene,0,1.1,-3.5,.65,.18,.34,yellow);
+ const g=new THREE.Group();scene.add(g);g.position.set(0,0,-3.55);dollMeshes.root=g;
+ const plush=mat('#d7ad72',1),dark=mat('#30251f'),white=mat('#fff1d8'),shoeMat=mat('#7b4d9b');
+ // Rounded potato plush body, with a distinct head, little arms and feet.
+ const body=new THREE.Mesh(new THREE.SphereGeometry(1,40,32),plush);body.position.set(0,1.27,0);body.scale.set(.58,.68,.48);g.add(body);dollMeshes.body=body;
+ const face=new THREE.Mesh(new THREE.SphereGeometry(.43,40,32),plush);face.position.set(0,1.88,.04);face.scale.set(1,.94,.8);g.add(face);dollMeshes.face=face;
+ for(const x of [-.16,.16]){const eye=new THREE.Mesh(new THREE.SphereGeometry(.035,12,10),dark);eye.position.set(x,1.93,.39);g.add(eye)}
+ const smile=new THREE.Mesh(new THREE.TorusGeometry(.075,.012,8,24,Math.PI),dark);smile.position.set(0,1.79,.405);smile.rotation.z=Math.PI;g.add(smile);
+ for(const side of [-1,1]){
+  const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.075,.28,5,10),plush);arm.position.set(side*.57,1.32,.02);arm.rotation.z=side*.9;g.add(arm);
+  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.09,.19,5,10),plush);leg.position.set(side*.23,.48,.04);leg.rotation.z=side*.12;g.add(leg);
+ }
+ // Outfit: a flared dress with collar and a visible hem.
+ const outfitMat=mat('#397fc5',.8),collarMat=mat('#fff0d5'),accessoryMat=mat('#e34d63',.65),hatMat=mat('#e8bd42',.8);
+ const dress=new THREE.Mesh(new THREE.CylinderGeometry(.39,.59,.66,32,1,false),outfitMat);dress.position.set(0,1.13,.015);dress.scale.z=.78;g.add(dress);dollMeshes.outfit=dress;
+ const collar=new THREE.Mesh(new THREE.TorusGeometry(.18,.045,8,32),collarMat);collar.position.set(0,1.48,.22);collar.rotation.x=Math.PI/2;g.add(collar);
+ const hem=new THREE.Mesh(new THREE.TorusGeometry(.48,.025,8,32),collarMat);hem.position.set(0,.8,.015);hem.scale.z=.8;g.add(hem);
+ // Beanie / beret-style wearable head accessory.
+ const hat=new THREE.Mesh(new THREE.SphereGeometry(.37,24,16,0,Math.PI*2,0,Math.PI/2),hatMat);hat.position.set(0,2.22,.02);hat.scale.set(1,.55,.85);g.add(hat);dollMeshes.headwear=hat;
+ const hatBand=new THREE.Mesh(new THREE.TorusGeometry(.34,.045,8,28),collarMat);hatBand.position.set(0,2.2,.02);hatBand.scale.z=.85;g.add(hatBand);
+ // Big bow on the front of the outfit as the detachable accessory.
+ const bowGroup=new THREE.Group();bowGroup.position.set(0,1.2,.43);g.add(bowGroup);
+ const bowL=new THREE.Mesh(new THREE.SphereGeometry(.16,18,14),accessoryMat);bowL.scale.set(1,.65,.35);bowL.position.x=-.13;bowGroup.add(bowL);
+ const bowR=bowL.clone();bowR.position.x=.13;bowGroup.add(bowR);
+ const knot=new THREE.Mesh(new THREE.SphereGeometry(.075,16,12),collarMat);bowGroup.add(knot);dollMeshes.accessory=bowGroup;
+ // Small matching shoes make the character read as a dressed doll.
+ const shoes=new THREE.Group();g.add(shoes);
+ for(const x of [-.23,.23]){const shoe=new THREE.Mesh(new THREE.SphereGeometry(.15,18,12),shoeMat);shoe.scale.set(1,.55,1.25);shoe.position.set(x,.28,.12);shoes.add(shoe)}
+ dollMeshes.shoes=shoes;
 }
+
 function setRole(r){currentRole=r||'B';setStage(currentStage)}
 function setStage(n){
  currentStage=n;if(!ready)return;
@@ -132,7 +168,13 @@ function setStage(n){
  Object.values(dollMeshes).forEach(o=>o.visible=n===3);
 }
 function setSwitch(n,state){const o=switchMeshes[n-1];if(!o)return;o.state=!!state;o.stem.rotation.z=state?-.18:.62;o.pivot.userData.state=!!state}
-function setDollPart(part,color){const o=dollMeshes[part];if(!o)return;o.material=mat(['#e95b4a','#398dc2','#efc34b'][color]||'#999',.7)}
+function setDollPart(part,color){
+ const palette=['#e95b4a','#398dc2','#efc34b'];const c=palette[color]||'#999';const material=mat(c,.72);
+ const o=dollMeshes[part];if(!o)return;
+ if(part==='accessory'){o.children.forEach(child=>{if(child.material&&child.material.color.getHexString()!=='fff1d8')child.material=material});return}
+ if(part==='shoes'){o.children.forEach(child=>child.material=material);return}
+ o.material=material;
+}
 function updateBubble(){
  const el=document.getElementById('partnerBubble');if(!el||!avatarBubblePoint||!camera||!renderer)return;
  const p=avatarBubblePoint.clone().project(camera),rect=renderer.domElement.getBoundingClientRect();
