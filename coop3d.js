@@ -151,8 +151,7 @@ function makeDoll(){
  for(const side of [-1,1]){const leg=new THREE.Mesh(new THREE.SphereGeometry(1,20,16),pants);leg.scale.set(.14,.035,.22);leg.position.set(side*.2,.145,.57);pantsGroup.add(leg)}
  dollMeshes.shoes=[];
  for(const side of [-1,1]){const shoe=new THREE.Mesh(new THREE.SphereGeometry(1,20,16),mat('#7b4d9b'));shoe.scale.set(.16,.045,.13);shoe.position.set(side*.2,.15,.78);g.add(shoe);dollMeshes.shoes.push(shoe)}
- // Hat and bow remain optional, visibly separate color regions.
- const hat=new THREE.Mesh(new THREE.SphereGeometry(1,24,18),mat('#e8bd42'));hat.scale.set(.34,.075,.22);hat.position.set(0,.19,-.77);g.add(hat);dollMeshes.headwear=hat;
+ // No hat part: the bear's ears remain visible and unobstructed.
  const bowGroup=new THREE.Group();bowGroup.position.set(0,.205,-.25);g.add(bowGroup);
  const bowMat=mat('#e34d63');
  for(const side of [-1,1]){const loop=new THREE.Mesh(new THREE.SphereGeometry(1,18,14),bowMat);loop.scale.set(.12,.035,.09);loop.position.x=side*.105;bowGroup.add(loop)}
