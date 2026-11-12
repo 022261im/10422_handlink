@@ -81,27 +81,34 @@ function makeRoom(){
  box(scene,-5.5,3.2,-11.78,1.1,1.6,.12,mat('#f5b33c'));box(scene,5.3,3.1,-11.78,1.3,1.5,.12,mat('#19a58e'));
  makePotato();
 }
-function makeManual(){
- const g=new THREE.Group();scene.add(g);g.position.set(0,1.205,-1.05);
- const page=mat('#f4e9d1',.95),edge=mat('#b99b6c'),blue=mat('#2456a7'),ink=mat('#1e3558');
- // open two-page instruction booklet resting flat on the desk
- box(g,0,0,0,3.9,.055,2.48,edge);
- box(g,-.96,.04,0,1.9,.025,2.38,page);box(g,.96,.04,0,1.9,.025,2.38,page);
- box(g,0,.06,0,.07,.025,2.38,blue);
- const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=760;const c=canvas.getContext('2d');
+let manualCanvas=null,manualTexture=null;
+function drawManual(plan){
+ if(!manualCanvas)return;
+ const c=manualCanvas.getContext('2d');c.clearRect(0,0,1200,760);
  c.fillStyle='#f4edda';c.fillRect(0,0,1200,760);c.strokeStyle='#2855a2';c.lineWidth=12;c.strokeRect(18,18,1164,724);c.beginPath();c.moveTo(600,24);c.lineTo(600,736);c.stroke();
  c.fillStyle='#244b91';c.font='bold 44px sans-serif';c.fillText('STAGE 02 · SAFETY PROTOCOL',65,90);
  c.fillStyle='#1e2e4a';c.font='bold 34px sans-serif';c.fillText('스위치 조작 순서',65,160);
- const lines=['1. 노란 표시등이 켜진 2번 레버 내리기','2. 3번 레버 올리기','3. 5번 레버 내리기','4. 1번 레버 올리기'];
+ const lines=(plan||[]).map((x,i)=>(i+1)+'. '+x.n+'번 레버 '+(x.state?'올리기':'내리기'));
  c.font='bold 27px sans-serif';lines.forEach((t,i)=>{c.fillStyle='#23334f';c.fillText(t,70,250+i*90)});
  c.fillStyle='#244b91';c.font='bold 34px sans-serif';c.fillText('레버 위치 안내',655,160);
- for(let i=0;i<6;i++){const x=690+i*78;c.fillStyle=i===1?'#efc340':'#d9d6cc';c.fillRect(x,225,56,105);c.strokeStyle='#263a5d';c.lineWidth=5;c.strokeRect(x,225,56,105);c.fillStyle='#1d2f4d';c.font='bold 30px sans-serif';c.fillText(String(i+1),x+19,285)}
- c.fillStyle='#31528a';c.font='24px sans-serif';c.fillText('노란 표시등이 켜진 번호를 먼저 확인하세요.',650,405);
+ for(let i=0;i<6;i++){const x=690+i*78;c.fillStyle=plan?.[0]?.n===i+1?'#efc340':'#d9d6cc';c.fillRect(x,225,56,105);c.strokeStyle='#263a5d';c.lineWidth=5;c.strokeRect(x,225,56,105);c.fillStyle='#1d2f4d';c.font='bold 30px sans-serif';c.fillText(String(i+1),x+19,285)}
+ c.fillStyle='#31528a';c.font='24px sans-serif';c.fillText('노란색으로 표시된 번호부터 순서대로 조작하세요.',650,405);
  c.fillText('엄지 위 = 올리기   ·   엄지 아래 = 내리기',650,470);
  c.fillStyle='#6b665b';c.font='22px sans-serif';c.fillText('상대가 조작을 마칠 때마다 상태를 확인하세요.',65,660);
- const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
- const picture=new THREE.Mesh(new THREE.PlaneGeometry(3.78,2.39),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));picture.position.set(0,.058,0);picture.rotation.x=-Math.PI/2;g.add(picture);
- manualGroup=g;
+ if(manualTexture)manualTexture.needsUpdate=true;
+}
+function setFusePlan(plan){drawManual(plan)}
+function makeManual(){
+ const g=new THREE.Group();scene.add(g);g.position.set(0,1.205,-1.05);
+ const page=mat('#f4e9d1',.95),edge=mat('#b99b6c'),blue=mat('#2456a7');
+ box(g,0,0,0,3.9,.055,2.48,edge);
+ box(g,-.96,.04,0,1.9,.025,2.38,page);box(g,.96,.04,0,1.9,.025,2.38,page);
+ box(g,0,.06,0,.07,.025,2.38,blue);
+ manualCanvas=document.createElement('canvas');manualCanvas.width=1200;manualCanvas.height=760;
+ manualTexture=new THREE.CanvasTexture(manualCanvas);manualTexture.colorSpace=THREE.SRGBColorSpace;
+ const picture=new THREE.Mesh(new THREE.PlaneGeometry(3.78,2.39),new THREE.MeshBasicMaterial({map:manualTexture,side:THREE.DoubleSide}));
+ picture.position.set(0,.058,0);picture.rotation.x=-Math.PI/2;g.add(picture);
+ manualGroup=g;drawManual([]);
 }
 function makeSwitchPanel(){
  const g=new THREE.Group();scene.add(g);g.position.set(0,1.205,-2.55);
@@ -206,5 +213,5 @@ function init(){
  new ResizeObserver(resize).observe(host);resize();ready=true;setStage(1);animate();
 }
 function animate(){requestAnimationFrame(animate);if(ready){renderer.render(scene,camera);updateBubble()}}
-window.Handlink3D={init,setStage,setRole,setSwitch,setDollPart,showPartnerBubble};
+window.Handlink3D={init,setStage,setRole,setSwitch,setDollPart,setFusePlan,showPartnerBubble};
 })();
