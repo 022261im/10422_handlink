@@ -1,6 +1,6 @@
 (()=>{'use strict';
 let scene,renderer,camera,host,ready=false,avatarBubblePoint,bubbleActive=false;
-let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.08,yaw=0;
+let switchMeshes=[],switchLabels=[],dollMeshes={},protocolObjects=[],manualGroup=null,switchPanelGroup=null,currentRole='B',currentStage=1,pitch=-.12,yaw=0;
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 function box(parent,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
@@ -137,7 +137,7 @@ function onClick(e){
 }
 function init(){
  if(ready)return;host=document.getElementById('threeStage');if(!host||!window.THREE)return;
- scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(66,1,.08,80);camera.position.set(0,1.72,4.35);camera.rotation.order='YXZ';camera.rotation.x=pitch;
+ scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(66,1,.08,80);camera.position.set(0,1.62,1.05);camera.rotation.order='YXZ';camera.rotation.x=pitch;
  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;host.appendChild(renderer.domElement);
  renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());renderer.domElement.addEventListener('pointermove',onPointerMove);renderer.domElement.addEventListener('click',onClick);
  makeRoom();makeManual();makeSwitchPanel();makeDoll();
